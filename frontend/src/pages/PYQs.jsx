@@ -1,10 +1,33 @@
 import Sidebar from "../components/Sidebar";
 import PYQCard from "../components/PYQCard";
 import { PYQS } from "../data/pyqs";
+import { useFilters } from "../context/FilterContext";
 
 const PYQs = () => {
-  // TEMPORARY: frontend-only
-  const filteredPYQs = PYQS;
+  const { filters } = useFilters();
+
+  const filteredPYQs = PYQS.filter((pyq) => {
+    if (filters.course !== "all" && pyq.course !== filters.course) {
+      return false;
+    }
+
+    if (
+      filters.semester !== "all" &&
+      pyq.semester !== Number(filters.semester)
+    ) {
+      return false;
+    }
+
+    if (filters.branch !== "all" && pyq.branch !== filters.branch) {
+      return false;
+    }
+
+    if (filters.subject !== "all" && pyq.subject !== filters.subject) {
+      return false;
+    }
+
+    return true;
+  });
 
   return (
     <div className="flex min-h-screen bg-appBg">

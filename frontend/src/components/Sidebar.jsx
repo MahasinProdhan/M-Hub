@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
-import { COURSES, SEMESTERS, SUBJECTS } from "../utils/constants.js";
+import { COURSES, SEMESTERS, SUBJECTS } from "../utils/constants";
+import { useFilters } from "../context/FilterContext";
 
 const BRANCH_TO_SUBJECT_KEY = {
   "Computer Science Engineering": "cse",
@@ -7,28 +8,25 @@ const BRANCH_TO_SUBJECT_KEY = {
 };
 
 const Sidebar = () => {
-  const initialCourseId = COURSES[0]?.id ?? "";
-  const initialCourse = COURSES.find((course) => course.id === initialCourseId);
-  const initialBranch = initialCourse?.hasBranches
-    ? (initialCourse.branches?.[0] ?? "")
-    : "";
+  const { setFilters } = useFilters();
 
-  const [selectedCourseId, setSelectedCourseId] = useState(initialCourseId);
-  const [selectedBranch, setSelectedBranch] = useState(initialBranch);
-  const [selectedSemester, setSelectedSemester] = useState(
-    String(SEMESTERS[0] ?? ""),
-  );
+  // ✅ IMPORTANT: start with "all"
+  const [selectedCourseId, setSelectedCourseId] = useState("all");
+  const [selectedSemester, setSelectedSemester] = useState("all");
+  const [selectedBranch, setSelectedBranch] = useState("all");
   const [selectedSubject, setSelectedSubject] = useState("all");
 
-  const selectedCourse = useMemo(
-    () => COURSES.find((course) => course.id === selectedCourseId),
-    [selectedCourseId],
-  );
+  const selectedCourse = useMemo(() => {
+    if (selectedCourseId === "all") return null;
+    return COURSES.find((course) => course.id === selectedCourseId);
+  }, [selectedCourseId]);
 
   const subjectOptions = useMemo(() => {
-    if (!selectedCourse) return SUBJECTS.common;
+    if (!selectedCourse || !selectedCourse.hasBranches) {
+      return SUBJECTS.common;
+    }
 
-    if (!selectedCourse.hasBranches) {
+    if (selectedBranch === "all") {
       return SUBJECTS.common;
     }
 
@@ -38,20 +36,27 @@ const Sidebar = () => {
     return [...new Set([...SUBJECTS.common, ...branchSubjects])];
   }, [selectedCourse, selectedBranch]);
 
-  const handleCourseChange = (event) => {
-    const nextCourseId = event.target.value;
-    const nextCourse = COURSES.find((course) => course.id === nextCourseId);
+  const handleCourseChange = (e) => {
+    const value = e.target.value;
+    setSelectedCourseId(value);
 
-    setSelectedCourseId(nextCourseId);
-    setSelectedBranch(
-      nextCourse?.hasBranches ? (nextCourse.branches?.[0] ?? "") : "",
-    );
+    // reset dependent filters
+    setSelectedBranch("all");
     setSelectedSubject("all");
   };
 
-  const handleBranchChange = (event) => {
-    setSelectedBranch(event.target.value);
+  const handleBranchChange = (e) => {
+    setSelectedBranch(e.target.value);
     setSelectedSubject("all");
+  };
+
+  const applyFilters = () => {
+    setFilters({
+      course: selectedCourseId,
+      semester: selectedSemester,
+      branch: selectedBranch,
+      subject: selectedSubject,
+    });
   };
 
   return (
@@ -69,6 +74,7 @@ const Sidebar = () => {
           onChange={handleCourseChange}
           className="w-full h-10 px-3 text-sm border rounded-md border-borderLight"
         >
+          <option value="all">All Courses</option>
           {COURSES.map((course) => (
             <option key={course.id} value={course.id}>
               {course.name}
@@ -84,9 +90,10 @@ const Sidebar = () => {
         </label>
         <select
           value={selectedSemester}
-          onChange={(event) => setSelectedSemester(event.target.value)}
+          onChange={(e) => setSelectedSemester(e.target.value)}
           className="w-full h-10 px-3 text-sm border rounded-md border-borderLight"
         >
+          <option value="all">All Semesters</option>
           {SEMESTERS.map((sem) => (
             <option key={sem} value={String(sem)}>
               Semester {sem}
@@ -106,6 +113,7 @@ const Sidebar = () => {
             onChange={handleBranchChange}
             className="w-full h-10 px-3 text-sm border rounded-md border-borderLight"
           >
+            <option value="all">All Branches</option>
             {selectedCourse.branches.map((branch) => (
               <option key={branch} value={branch}>
                 {branch}
@@ -122,7 +130,7 @@ const Sidebar = () => {
         </label>
         <select
           value={selectedSubject}
-          onChange={(event) => setSelectedSubject(event.target.value)}
+          onChange={(e) => setSelectedSubject(e.target.value)}
           className="w-full h-10 px-3 text-sm border rounded-md border-borderLight"
         >
           <option value="all">All Subjects</option>
@@ -135,7 +143,10 @@ const Sidebar = () => {
       </div>
 
       {/* Apply Button */}
-      <button className="w-full h-10 text-sm font-medium text-white rounded-md bg-primary">
+      <button
+        onClick={applyFilters}
+        className="w-full h-10 text-sm font-medium text-white rounded-md bg-primary"
+      >
         Apply Filters
       </button>
 
