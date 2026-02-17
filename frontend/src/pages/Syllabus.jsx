@@ -1,52 +1,79 @@
+import { useEffect, useState } from "react";
 import Sidebar from "../components/Sidebar";
 import SyllabusCard from "../components/SyllabusCard";
-import { SYLLABUS } from "../data/syllabus";
 import { useFilters } from "../context/FilterContext";
 
 const Syllabus = () => {
   const { filters } = useFilters();
 
-  const filteredSyllabus = SYLLABUS.filter((item) => {
-    if (filters.course !== "all" && item.course !== filters.course) {
-      return false;
-    }
+  const [syllabus, setSyllabus] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-    if (
-      filters.semester !== "all" &&
-      item.semester !== Number(filters.semester)
-    ) {
-      return false;
-    }
+  useEffect(() => {
+    const fetchSyllabus = async () => {
+      try {
+        setLoading(true);
 
-    if (filters.branch !== "all" && item.branch !== filters.branch) {
-      return false;
-    }
+        const params = new URLSearchParams();
 
-    return true;
-  });
+        if (filters.course !== "all") params.append("course", filters.course);
+        if (filters.semester !== "all")
+          params.append("semester", filters.semester);
+        if (filters.branch !== "all") params.append("branch", filters.branch);
+
+        const response = await fetch(
+          `http://localhost:5000/api/syllabus?${params.toString()}`,
+        );
+
+        const result = await response.json();
+
+        setSyllabus(result.data);
+        setError(null);
+      } catch (err) {
+        setError("Failed to load syllabus");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchSyllabus();
+  }, [filters]);
 
   return (
     <div className="flex min-h-screen bg-appBg">
+      {/* Sidebar */}
       <Sidebar />
 
       <main className="flex-1 p-8">
+        {/* Page Header */}
         <div className="mb-6">
           <h1 className="text-2xl font-semibold text-textPrimary">Syllabus</h1>
           <p className="mt-1 text-sm text-textSecondary">
-            Showing {filteredSyllabus.length} results
+            Showing {syllabus.length} results
           </p>
         </div>
 
-        {filteredSyllabus.length > 0 ? (
+        {/* Loading */}
+        {loading && <p>Loading syllabus...</p>}
+
+        {/* Error */}
+        {error && <p className="text-red-500">{error}</p>}
+
+        {/* Syllabus List */}
+        {!loading && !error && syllabus.length > 0 ? (
           <div className="space-y-4">
-            {filteredSyllabus.map((syllabus) => (
-              <SyllabusCard key={syllabus.id} syllabus={syllabus} />
+            {syllabus.map((item) => (
+              <SyllabusCard key={item._id} syllabus={item} />
             ))}
           </div>
         ) : (
-          <div className="p-6 text-center card text-textSecondary">
-            No syllabus found for selected filters.
-          </div>
+          !loading &&
+          !error && (
+            <div className="p-6 text-center card text-textSecondary">
+              No syllabus found for selected filters.
+            </div>
+          )
         )}
       </main>
     </div>
