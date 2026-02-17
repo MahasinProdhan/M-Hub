@@ -24,6 +24,9 @@ const PYQs = () => {
         if (filters.subject !== "all")
           params.append("subject", filters.subject);
 
+        // 🔍 SEARCH SUPPORT
+        if (filters.search) params.append("search", filters.search);
+
         const response = await fetch(
           `http://localhost:5000/api/pyqs?${params.toString()}`,
         );
@@ -44,12 +47,9 @@ const PYQs = () => {
 
   return (
     <div className="flex min-h-screen bg-appBg">
-      {/* Sidebar */}
       <Sidebar />
 
-      {/* Main Content */}
       <main className="flex-1 p-8">
-        {/* Page Header */}
         <div className="mb-6">
           <h1 className="text-2xl font-semibold text-textPrimary">
             Previous Year Questions
@@ -59,13 +59,9 @@ const PYQs = () => {
           </p>
         </div>
 
-        {/* Loading */}
         {loading && <p>Loading PYQs...</p>}
-
-        {/* Error */}
         {error && <p className="text-red-500">{error}</p>}
 
-        {/* PYQ List */}
         {!loading && !error && pyqs.length > 0 ? (
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {pyqs.map((pyq) => (

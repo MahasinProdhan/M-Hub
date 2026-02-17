@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { useLocation } from "react-router-dom"; // ✅ NEW
 import { COURSES, SEMESTERS, SUBJECTS } from "../utils/constants";
 import { useFilters } from "../context/FilterContext";
 
@@ -9,12 +10,19 @@ const BRANCH_TO_SUBJECT_KEY = {
 
 const Sidebar = () => {
   const { setFilters } = useFilters();
+  const location = useLocation(); // ✅ NEW
 
-  // ✅ IMPORTANT: start with "all"
+  // 🔍 hide search & subject on syllabus page
+  const isSyllabusPage = location.pathname === "/syllabus";
+
+  // existing local states
   const [selectedCourseId, setSelectedCourseId] = useState("all");
   const [selectedSemester, setSelectedSemester] = useState("all");
   const [selectedBranch, setSelectedBranch] = useState("all");
   const [selectedSubject, setSelectedSubject] = useState("all");
+
+  // 🔍 SEARCH: local search state
+  const [searchText, setSearchText] = useState("");
 
   const selectedCourse = useMemo(() => {
     if (selectedCourseId === "all") return null;
@@ -40,7 +48,6 @@ const Sidebar = () => {
     const value = e.target.value;
     setSelectedCourseId(value);
 
-    // reset dependent filters
     setSelectedBranch("all");
     setSelectedSubject("all");
   };
@@ -55,14 +62,30 @@ const Sidebar = () => {
       course: selectedCourseId,
       semester: selectedSemester,
       branch: selectedBranch,
-      subject: selectedSubject,
+      subject: isSyllabusPage ? "all" : selectedSubject, // ✅ SAFE
+      search: isSyllabusPage ? "" : searchText, // ✅ SAFE
     });
   };
 
   return (
     <aside className="w-[280px] min-h-screen bg-white border-r border-borderLight p-6 hidden md:block">
-      {/* Title */}
       <h2 className="mb-4 text-sm font-semibold text-textPrimary">Filters</h2>
+
+      {/* 🔍 SEARCH (HIDDEN ON SYLLABUS) */}
+      {!isSyllabusPage && (
+        <div className="mb-4">
+          <label className="block mb-1 text-xs font-medium text-textSecondary">
+            Search
+          </label>
+          <input
+            type="text"
+            placeholder="Search subject or title..."
+            value={searchText}
+            onChange={(e) => setSearchText(e.target.value)}
+            className="w-full h-10 px-3 text-sm border rounded-md border-borderLight"
+          />
+        </div>
+      )}
 
       {/* Course */}
       <div className="mb-4">
@@ -123,24 +146,26 @@ const Sidebar = () => {
         </div>
       )}
 
-      {/* Subject */}
-      <div className="mb-6">
-        <label className="block mb-1 text-xs font-medium text-textSecondary">
-          Subject
-        </label>
-        <select
-          value={selectedSubject}
-          onChange={(e) => setSelectedSubject(e.target.value)}
-          className="w-full h-10 px-3 text-sm border rounded-md border-borderLight"
-        >
-          <option value="all">All Subjects</option>
-          {subjectOptions.map((subject) => (
-            <option key={subject} value={subject}>
-              {subject}
-            </option>
-          ))}
-        </select>
-      </div>
+      {/* Subject (HIDDEN ON SYLLABUS) */}
+      {!isSyllabusPage && (
+        <div className="mb-6">
+          <label className="block mb-1 text-xs font-medium text-textSecondary">
+            Subject
+          </label>
+          <select
+            value={selectedSubject}
+            onChange={(e) => setSelectedSubject(e.target.value)}
+            className="w-full h-10 px-3 text-sm border rounded-md border-borderLight"
+          >
+            <option value="all">All Subjects</option>
+            {subjectOptions.map((subject) => (
+              <option key={subject} value={subject}>
+                {subject}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
 
       {/* Apply Button */}
       <button
@@ -150,10 +175,8 @@ const Sidebar = () => {
         Apply Filters
       </button>
 
-      {/* Divider */}
       <hr className="my-6 border-borderLight" />
 
-      {/* Quick Links */}
       <div>
         <p className="mb-2 text-xs font-semibold text-textSecondary">
           Quick Access

@@ -8,6 +8,7 @@ export const FilterProvider = ({ children }) => {
     semester: "all",
     branch: "all",
     subject: "all",
+    search: "", // ✅ ADD THIS
   });
 
   return (

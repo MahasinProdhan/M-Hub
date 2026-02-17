@@ -24,6 +24,8 @@ const Organizers = () => {
         if (filters.subject !== "all")
           params.append("subject", filters.subject);
 
+        // 🔍 SEARCH SUPPORT
+        if (filters.search) params.append("search", filters.search);
         const response = await fetch(
           `http://localhost:5000/api/organizers?${params.toString()}`,
         );
