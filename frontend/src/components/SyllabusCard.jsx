@@ -9,11 +9,15 @@ const SyllabusCard = ({ syllabus }) => {
         </div>
 
         <div>
+          {/* Main title */}
           <h3 className="text-base font-semibold text-textPrimary">
-            {syllabus.title}
+            {syllabus.course.toUpperCase()}
+            {syllabus.branch && ` - ${syllabus.branch}`}
           </h3>
+
+          {/* Subtitle */}
           <p className="text-sm text-textSecondary">
-            Semester {syllabus.semester} · {syllabus.course.toUpperCase()}
+            Semester {syllabus.semester}
           </p>
         </div>
       </div>

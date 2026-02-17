@@ -1,33 +1,46 @@
+import { useEffect, useState } from "react";
 import Sidebar from "../components/Sidebar";
 import PYQCard from "../components/PYQCard";
-import { PYQS } from "../data/pyqs";
 import { useFilters } from "../context/FilterContext";
 
 const PYQs = () => {
   const { filters } = useFilters();
 
-  const filteredPYQs = PYQS.filter((pyq) => {
-    if (filters.course !== "all" && pyq.course !== filters.course) {
-      return false;
-    }
+  const [pyqs, setPyqs] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-    if (
-      filters.semester !== "all" &&
-      pyq.semester !== Number(filters.semester)
-    ) {
-      return false;
-    }
+  useEffect(() => {
+    const fetchPYQs = async () => {
+      try {
+        setLoading(true);
 
-    if (filters.branch !== "all" && pyq.branch !== filters.branch) {
-      return false;
-    }
+        const params = new URLSearchParams();
 
-    if (filters.subject !== "all" && pyq.subject !== filters.subject) {
-      return false;
-    }
+        if (filters.course !== "all") params.append("course", filters.course);
+        if (filters.semester !== "all")
+          params.append("semester", filters.semester);
+        if (filters.branch !== "all") params.append("branch", filters.branch);
+        if (filters.subject !== "all")
+          params.append("subject", filters.subject);
 
-    return true;
-  });
+        const response = await fetch(
+          `http://localhost:5000/api/pyqs?${params.toString()}`,
+        );
+
+        const result = await response.json();
+
+        setPyqs(result.data);
+        setError(null);
+      } catch (err) {
+        setError("Failed to load PYQs");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPYQs();
+  }, [filters]);
 
   return (
     <div className="flex min-h-screen bg-appBg">
@@ -42,21 +55,30 @@ const PYQs = () => {
             Previous Year Questions
           </h1>
           <p className="mt-1 text-sm text-textSecondary">
-            Showing {filteredPYQs.length} results
+            Showing {pyqs.length} results
           </p>
         </div>
 
+        {/* Loading */}
+        {loading && <p>Loading PYQs...</p>}
+
+        {/* Error */}
+        {error && <p className="text-red-500">{error}</p>}
+
         {/* PYQ List */}
-        {filteredPYQs.length > 0 ? (
+        {!loading && !error && pyqs.length > 0 ? (
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {filteredPYQs.map((pyq) => (
-              <PYQCard key={pyq.id} pyq={pyq} />
+            {pyqs.map((pyq) => (
+              <PYQCard key={pyq._id} pyq={pyq} />
             ))}
           </div>
         ) : (
-          <div className="p-6 text-center card text-textSecondary">
-            No PYQs found for selected filters.
-          </div>
+          !loading &&
+          !error && (
+            <div className="p-6 text-center card text-textSecondary">
+              No PYQs found for selected filters.
+            </div>
+          )
         )}
       </main>
     </div>
