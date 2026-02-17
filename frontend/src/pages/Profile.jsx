@@ -1,7 +1,117 @@
-import React from "react";
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext.jsx";
+import { User } from "lucide-react";
 
 const Profile = () => {
-  return <div>Profile</div>;
+  const { user, isLoggedIn, logout, loading } = useAuth();
+  const navigate = useNavigate();
+
+  // Soft UX protection
+  useEffect(() => {
+    if (!loading && !isLoggedIn) {
+      navigate("/login");
+    }
+  }, [isLoggedIn, loading, navigate]);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <p className="text-textSecondary">Loading...</p>
+      </div>
+    );
+  }
+
+  if (!user) return null;
+
+  return (
+    <div className="flex items-center justify-center min-h-screen px-4 bg-appBg">
+      <div className="w-full max-w-4xl p-8 bg-white shadow-sm rounded-xl">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            <h1 className="text-2xl font-semibold text-textPrimary">
+              My Profile
+            </h1>
+            <p className="text-sm text-textSecondary">
+              Manage your personal information and contact details.
+            </p>
+          </div>
+
+          <div className="flex items-center gap-4">
+            <div className="flex items-center justify-center w-16 h-16 bg-gray-100 rounded-full">
+              <User className="w-8 h-8 text-gray-400" />
+            </div>
+            <p className="text-lg font-medium text-textPrimary">{user.name}</p>
+          </div>
+        </div>
+
+        {/* Info Sections */}
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+          {/* Contact Info */}
+          <div className="p-6 border rounded-lg border-borderLight">
+            <h3 className="mb-4 text-sm font-semibold tracking-wide text-textSecondary">
+              CONTACT INFORMATION
+            </h3>
+
+            <div className="space-y-4">
+              <div>
+                <p className="text-xs text-textSecondary">EMAIL</p>
+                <p className="text-sm font-medium text-textPrimary">
+                  {user.email}
+                </p>
+              </div>
+
+              <div>
+                <p className="text-xs text-textSecondary">ROLE</p>
+                <p className="text-sm font-medium capitalize text-textPrimary">
+                  {user.role}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Basic Info */}
+          <div className="p-6 border rounded-lg border-borderLight">
+            <h3 className="mb-4 text-sm font-semibold tracking-wide text-textSecondary">
+              BASIC INFORMATION
+            </h3>
+
+            <div className="space-y-4">
+              <div>
+                <p className="text-xs text-textSecondary">ACCOUNT TYPE</p>
+                <p className="text-sm font-medium text-textPrimary">
+                  {user.role === "admin" ? "Administrator" : "Student"}
+                </p>
+              </div>
+
+              <div>
+                <p className="text-xs text-textSecondary">STATUS</p>
+                <p className="text-sm font-medium text-green-600">Active</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Actions */}
+        <div className="flex items-center justify-between mt-8">
+          <button className="px-6 py-2 text-sm font-medium border rounded-md border-borderLight text-textPrimary hover:bg-gray-50">
+            Edit (Coming Soon)
+          </button>
+
+          <button
+            onClick={() => {
+              logout();
+              navigate("/");
+            }}
+            className="px-6 py-2 text-sm font-medium text-white bg-red-500 rounded-md hover:bg-red-600"
+          >
+            Logout
+          </button>
+        </div>
+      </div>
+    </div>
+  );
 };
 
 export default Profile;
