@@ -24,6 +24,8 @@ const StudyMaterials = () => {
         if (filters.subject !== "all")
           params.append("subject", filters.subject);
 
+        if (filters.search) params.append("search", filters.search);
+
         const response = await fetch(
           `http://localhost:5000/api/materials?${params.toString()}`,
         );
