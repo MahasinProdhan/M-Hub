@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import { useLocation } from "react-router-dom"; // ✅ NEW
+import { RotateCcw } from "lucide-react";
 import { COURSES, SEMESTERS, SUBJECTS } from "../utils/constants";
 import { useFilters } from "../context/FilterContext";
 
@@ -64,6 +65,29 @@ const Sidebar = () => {
       branch: selectedBranch,
       subject: isSyllabusPage ? "all" : selectedSubject, // ✅ SAFE
       search: isSyllabusPage ? "" : searchText, // ✅ SAFE
+    });
+  };
+
+  const hasActiveFilters =
+    selectedCourseId !== "all" ||
+    selectedSemester !== "all" ||
+    selectedBranch !== "all" ||
+    selectedSubject !== "all" ||
+    searchText.trim() !== "";
+
+  const handleClearFilters = () => {
+    setSelectedCourseId("all");
+    setSelectedSemester("all");
+    setSelectedBranch("all");
+    setSelectedSubject("all");
+    setSearchText("");
+
+    setFilters({
+      course: "all",
+      semester: "all",
+      branch: "all",
+      subject: "all",
+      search: "",
     });
   };
 
@@ -167,13 +191,25 @@ const Sidebar = () => {
         </div>
       )}
 
-      {/* Apply Button */}
-      <button
-        onClick={applyFilters}
-        className="w-full h-10 text-sm font-medium text-white rounded-md bg-primary"
-      >
-        Apply Filters
-      </button>
+      <div className="space-y-3">
+        <button
+          type="button"
+          onClick={applyFilters}
+          className="w-full h-10 text-sm font-medium text-white transition-colors rounded-md bg-primary hover:bg-primary/90"
+        >
+          Apply Filters
+        </button>
+
+        <button
+          type="button"
+          onClick={handleClearFilters}
+          disabled={!hasActiveFilters}
+          className="flex items-center justify-center w-full h-10 gap-2 text-sm font-medium transition-colors border rounded-md border-danger/30 bg-red-50 text-danger hover:bg-red-100 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          <RotateCcw size={16} />
+          Clear Filters
+        </button>
+      </div>
 
       <hr className="my-6 border-borderLight" />
 

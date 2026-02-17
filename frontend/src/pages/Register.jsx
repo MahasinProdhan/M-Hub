@@ -1,6 +1,40 @@
-import { Link } from "react-router-dom";
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 
 const Register = () => {
+  const navigate = useNavigate();
+
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
+
+    try {
+      const res = await fetch("http://localhost:5000/api/auth/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ name, email, password }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setError(data.message || "Registration failed");
+        return;
+      }
+
+      navigate("/login");
+    } catch (err) {
+      setError("Something went wrong. Try again.");
+    }
+  };
+
   return (
     <div className="flex items-center justify-center min-h-screen bg-appBg">
       <div className="w-full max-w-md p-8 card">
@@ -12,8 +46,11 @@ const Register = () => {
           Join M Hub to access academic resources
         </p>
 
+        {/* Error */}
+        {error && <p className="mt-3 text-sm text-red-500">{error}</p>}
+
         {/* Form */}
-        <form className="mt-6 space-y-4">
+        <form onSubmit={handleSubmit} className="mt-6 space-y-4">
           <div>
             <label className="block mb-1 text-sm font-medium text-textSecondary">
               Full Name
@@ -21,7 +58,10 @@ const Register = () => {
             <input
               type="text"
               placeholder="Your name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
               className="w-full px-4 text-sm border rounded-md h-11 border-borderLight"
+              required
             />
           </div>
 
@@ -32,7 +72,10 @@ const Register = () => {
             <input
               type="email"
               placeholder="you@example.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               className="w-full px-4 text-sm border rounded-md h-11 border-borderLight"
+              required
             />
           </div>
 
@@ -43,12 +86,15 @@ const Register = () => {
             <input
               type="password"
               placeholder="••••••••"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
               className="w-full px-4 text-sm border rounded-md h-11 border-borderLight"
+              required
             />
           </div>
 
           <button
-            type="button"
+            type="submit"
             className="w-full mt-2 text-sm font-medium text-white rounded-md h-11 bg-primary"
           >
             Register
@@ -61,10 +107,6 @@ const Register = () => {
           <Link to="/login" className="font-medium text-primary">
             Login
           </Link>
-        </p>
-
-        <p className="mt-3 text-xs text-center text-textSecondary">
-          Registration will be enabled after backend integration
         </p>
       </div>
     </div>

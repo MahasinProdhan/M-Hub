@@ -1,10 +1,10 @@
 import { Link, NavLink } from "react-router-dom";
 import logo from "../assets/icons/logo.png";
+// import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../context/AuthContext.jsx";
 
 const Navbar = () => {
-  // TEMPORARY: frontend-only
-  const isLoggedIn = false;
-  const userName = "Student";
+  const { isLoggedIn, user, logout } = useAuth();
 
   return (
     <nav className="bg-white border-b border-borderLight">
@@ -68,12 +68,23 @@ const Navbar = () => {
         {/* Right Side */}
         <div className="flex items-center gap-4">
           {isLoggedIn ? (
-            <NavLink
-              to="/profile"
-              className="text-sm font-medium text-textPrimary hover:text-primary"
-            >
-              {userName}
-            </NavLink>
+            <>
+              <div className="flex items-center gap-3">
+                <NavLink
+                  to="/profile"
+                  className="px-3 py-1 text-sm font-medium bg-gray-100 rounded-md text-textPrimary hover:bg-gray-200"
+                >
+                  {user?.name}
+                </NavLink>
+
+                <button
+                  onClick={logout}
+                  className="text-sm font-medium text-red-500 hover:text-red-600"
+                >
+                  Logout
+                </button>
+              </div>
+            </>
           ) : (
             <>
               <NavLink
@@ -82,6 +93,7 @@ const Navbar = () => {
               >
                 Login
               </NavLink>
+
               <NavLink
                 to="/register"
                 className="px-4 py-2 text-sm font-medium text-white rounded-md bg-primary"
