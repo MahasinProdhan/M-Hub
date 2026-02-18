@@ -1,7 +1,5 @@
 import express from "express";
 import cors from "cors";
-import path from "path";
-import { fileURLToPath } from "url";
 
 import authRoutes from "./routes/auth.routes.js";
 import pyqRoutes from "./routes/pyq.routes.js";
@@ -16,18 +14,29 @@ import adminOrganizerRoutes from "./routes/admin/organizer.admin.routes.js";
 import adminSyllabusRoutes from "./routes/admin/syllabus.admin.routes.js";
 import adminStatsRoutes from "./routes/admin/stats.admin.routes.js";
 import adminUserRoutes from "./routes/admin/user.admin.routes.js";
+import {
+  decodeAvatarProxyPath,
+  isCloudinaryAvatarUrl,
+} from "./utils/avatar.utils.js";
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
 
-// 🔥 REQUIRED FOR __dirname in ES module
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+app.get("/uploads/avatars/proxy/:encodedAvatarUrl", (req, res) => {
+  try {
+    const avatarUrl = decodeAvatarProxyPath(req.params.encodedAvatarUrl);
 
-// 🔥 SERVE UPLOADS CORRECTLY
-app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
+    if (!isCloudinaryAvatarUrl(avatarUrl)) {
+      return res.status(400).json({ message: "Invalid avatar URL" });
+    }
+
+    return res.redirect(avatarUrl);
+  } catch (error) {
+    return res.status(400).json({ message: "Invalid avatar URL" });
+  }
+});
 
 // routes
 app.use("/api/auth", authRoutes);

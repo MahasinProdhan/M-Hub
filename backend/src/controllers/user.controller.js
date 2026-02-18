@@ -1,4 +1,19 @@
-﻿import User from "../models/user.model.js";
+import cloudinary from "../config/cloudinary.js";
+import User from "../models/user.model.js";
+import {
+  extractCloudinaryPublicId,
+  toAvatarClientPath,
+} from "../utils/avatar.utils.js";
+
+const formatUserAvatarForClient = (userDoc) => {
+  if (!userDoc) return userDoc;
+
+  const user =
+    typeof userDoc.toObject === "function" ? userDoc.toObject() : { ...userDoc };
+
+  user.avatar = toAvatarClientPath(user.avatar);
+  return user;
+};
 
 /**
  * GET MY PROFILE
@@ -20,7 +35,7 @@ export const getMyProfile = async (req, res, next) => {
 
     res.status(200).json({
       success: true,
-      user,
+      user: formatUserAvatarForClient(user),
     });
   } catch (error) {
     next(error);
@@ -41,6 +56,7 @@ export const updateMyProfile = async (req, res, next) => {
 
     const { name, college, course, branch } = req.body;
     const updates = {};
+    let oldAvatarPublicId = null;
 
     if (name !== undefined) updates.name = name;
     if (college !== undefined) updates.college = college;
@@ -58,11 +74,18 @@ export const updateMyProfile = async (req, res, next) => {
     }
 
     if (req.file) {
-      updates.avatar = `/uploads/avatars/${req.file.filename}`;
+      const existingUser = await User.findById(userId).select("avatar");
+
+      if (!existingUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      oldAvatarPublicId = extractCloudinaryPublicId(existingUser.avatar);
+      updates.avatar = req.file.path;
     }
 
     const user = await User.findByIdAndUpdate(userId, updates, {
-      new: true,
+      returnDocument: "after",
       runValidators: true,
     }).select("-password");
 
@@ -70,10 +93,21 @@ export const updateMyProfile = async (req, res, next) => {
       return res.status(404).json({ message: "User not found" });
     }
 
+    if (oldAvatarPublicId) {
+      try {
+        await cloudinary.uploader.destroy(oldAvatarPublicId);
+      } catch (cloudinaryError) {
+        console.error(
+          "Failed to delete old Cloudinary avatar:",
+          cloudinaryError.message,
+        );
+      }
+    }
+
     res.status(200).json({
       success: true,
       message: "Profile updated successfully",
-      user,
+      user: formatUserAvatarForClient(user),
     });
   } catch (error) {
     next(error);
@@ -90,10 +124,12 @@ export const getAllUsers = async (req, res, next) => {
       .select("name email role college course branch avatar createdAt")
       .sort({ createdAt: -1 });
 
+    const responseUsers = users.map((user) => formatUserAvatarForClient(user));
+
     res.status(200).json({
       success: true,
-      count: users.length,
-      data: users,
+      count: responseUsers.length,
+      data: responseUsers,
     });
   } catch (error) {
     next(error);
