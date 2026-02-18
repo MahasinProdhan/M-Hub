@@ -35,7 +35,9 @@ const PYQCard = ({ pyq, isSaved = false, isSaving = false, onToggleSave }) => {
           </span>
         </div>
 
-        {pyq.branch && <p className="mt-2 text-sm text-textSecondary">{pyq.branch}</p>}
+        {pyq.branch && (
+          <p className="mt-2 text-sm text-textSecondary">{pyq.branch}</p>
+        )}
       </div>
 
       <div className="flex items-center justify-between mt-5">
@@ -49,7 +51,7 @@ const PYQCard = ({ pyq, isSaved = false, isSaving = false, onToggleSave }) => {
           rel="noopener noreferrer"
           className="text-sm font-medium text-primary hover:underline"
         >
-          View PDF
+          View
         </a>
       </div>
     </div>
