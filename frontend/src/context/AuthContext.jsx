@@ -16,6 +16,7 @@ export const AuthProvider = ({ children }) => {
       setToken(storedToken);
       setUser(JSON.parse(storedUser));
     }
+
     setLoading(false);
   }, []);
 
@@ -26,8 +27,15 @@ export const AuthProvider = ({ children }) => {
     setUser(user);
   };
 
+  // 🔥 IMPORTANT FIX
+  const updateUser = (updatedUser) => {
+    setUser(updatedUser);
+    localStorage.setItem("user", JSON.stringify(updatedUser));
+  };
+
   const logout = () => {
-    localStorage.clear();
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
     setToken(null);
     setUser(null);
   };
@@ -39,6 +47,7 @@ export const AuthProvider = ({ children }) => {
         token,
         isLoggedIn: !!user,
         login,
+        updateUser,
         logout,
         loading,
       }}
