@@ -1,5 +1,6 @@
 import Syllabus from "../../models/syllabus.model.js";
 
+// CREATE SYLLABUS
 export const createSyllabus = async (req, res, next) => {
   try {
     const { course, branch, semester, driveLink } = req.body;
@@ -20,6 +21,27 @@ export const createSyllabus = async (req, res, next) => {
     res.status(201).json({
       message: "Syllabus created successfully",
       syllabus,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// DELETE SYLLABUS
+export const deleteSyllabus = async (req, res, next) => {
+  try {
+    const syllabus = await Syllabus.findById(req.params.id);
+
+    if (!syllabus) {
+      return res.status(404).json({
+        message: "Syllabus not found",
+      });
+    }
+
+    await syllabus.deleteOne();
+
+    res.status(200).json({
+      message: "Syllabus deleted successfully",
     });
   } catch (error) {
     next(error);

@@ -23,16 +23,30 @@ const Sidebar = () => {
           Add PYQs
         </NavLink>
 
+        <NavLink to="/pyqs/manage" className={linkClass}>
+          Manage PYQs
+        </NavLink>
+
         <NavLink to="/materials/add" className={linkClass}>
           Add Materials
+        </NavLink>
+
+        <NavLink to="/materials/manage" className={linkClass}>
+          Manage Materials
         </NavLink>
 
         <NavLink to="/organizers/add" className={linkClass}>
           Add Organizers
         </NavLink>
+        <NavLink to="/organizers/manage" className={linkClass}>
+          Manage Organizers
+        </NavLink>
 
         <NavLink to="/syllabus/add" className={linkClass}>
           Add Syllabus
+        </NavLink>
+        <NavLink to="/syllabus/manage" className={linkClass}>
+          Manage Syllabus
         </NavLink>
       </nav>
     </aside>

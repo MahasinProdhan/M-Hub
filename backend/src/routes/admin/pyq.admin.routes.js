@@ -1,11 +1,17 @@
 import express from "express";
 import { protect } from "../../middlewares/auth.middleware.js";
 import { adminOnly } from "../../middlewares/admin.middleware.js";
-import { createPYQ } from "../../controllers/admin/pyq.admin.controller.js";
+import {
+  createPYQ,
+  deletePYQ,
+} from "../../controllers/admin/pyq.admin.controller.js";
 
 const router = express.Router();
 
 // Admin-only: Add PYQ
 router.post("/pyqs", protect, adminOnly, createPYQ);
+
+// Admin-only: Delete PYQ
+router.delete("/pyqs/:id", protect, adminOnly, deletePYQ);
 
 export default router;
