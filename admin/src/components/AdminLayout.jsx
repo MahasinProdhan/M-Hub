@@ -1,20 +1,18 @@
-import { Navigate } from "react-router-dom";
+﻿import { Navigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext.jsx";
 import logo from "../assets/icons/logo2.png";
 
 const AdminLayout = ({ children }) => {
   const { user, logout } = useAuth();
 
-  if (!user || user.role !== "admin") {
+  if (!user || !["admin", "superadmin"].includes(user.role)) {
     return <Navigate to="/login" replace />;
   }
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Top Navigation */}
       <header className="sticky top-0 z-50 bg-white border-b shadow-sm border-borderLight">
         <div className="container-page h-[70px] flex items-center justify-between">
-          {/* Logo + Branding */}
           <div className="flex items-center gap-4">
             <img
               src={logo}
@@ -30,11 +28,9 @@ const AdminLayout = ({ children }) => {
             </div>
           </div>
 
-          {/* Right Section */}
           <div className="flex items-center gap-6">
             <div className="hidden text-sm sm:block text-textSecondary">
-              Welcome,{" "}
-              <span className="font-medium text-textPrimary">{user?.name}</span>
+              Welcome, <span className="font-medium text-textPrimary">{user?.name}</span>
             </div>
 
             <button
@@ -47,7 +43,6 @@ const AdminLayout = ({ children }) => {
         </div>
       </header>
 
-      {/* Page Content */}
       <main className="py-5 container-page">{children}</main>
     </div>
   );

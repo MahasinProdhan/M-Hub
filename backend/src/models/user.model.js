@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+﻿import mongoose from "mongoose";
 
 const userSchema = new mongoose.Schema(
   {
@@ -22,34 +22,36 @@ const userSchema = new mongoose.Schema(
       minlength: 6,
     },
 
+    role: {
+      type: String,
+      enum: ["user", "admin", "superadmin"],
+      default: "user",
+    },
+
     college: {
       type: String,
-      required: true,
       trim: true,
+      default: "",
     },
 
     course: {
       type: String,
-      required: true,
-      lowercase: true,
-      enum: ["btech", "bca", "bsc", "ba"],
+      enum: ["btech", "bca", "bsc", "ba", ""],
+      default: "",
     },
 
     branch: {
       type: String,
-      default: null, // only for BTech
-      trim: true,
+      default: "",
     },
 
-    role: {
+    avatar: {
       type: String,
-      enum: ["user", "admin"],
-      default: "user",
+      default: "",
     },
   },
   { timestamps: true },
 );
 
 const User = mongoose.model("User", userSchema);
-
 export default User;
