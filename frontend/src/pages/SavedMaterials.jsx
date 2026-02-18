@@ -12,7 +12,7 @@ const TYPE_LABEL_MAP = {
 };
 
 const TYPE_BADGE_CLASS_MAP = {
-  pyq: "bg-blue-100 text-primary",
+  pyq: "bg-blue-100 text-blue-700",
   material: "bg-green-100 text-green-700",
   organizer: "bg-purple-100 text-purple-700",
 };

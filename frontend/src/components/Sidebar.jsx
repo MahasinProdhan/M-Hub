@@ -87,12 +87,14 @@ const Sidebar = () => {
   };
 
   return (
-    <aside className="w-[280px] min-h-screen bg-white border-r border-borderLight p-6 hidden md:block">
-      <h2 className="mb-4 text-sm font-semibold text-textPrimary">Filters</h2>
+    <aside className="hidden min-h-screen w-[280px] border-r border-slate-200 bg-white p-6 md:block">
+      <h2 className="mb-4 text-xs font-semibold uppercase tracking-wide text-slate-500">
+        Filters
+      </h2>
 
       {!isSyllabusPage && (
         <div className="mb-4">
-          <label className="block mb-1 text-xs font-medium text-textSecondary">
+          <label className="mb-1 block text-xs font-medium text-slate-500">
             Search
           </label>
           <input
@@ -100,19 +102,19 @@ const Sidebar = () => {
             placeholder="Search subject or title..."
             value={searchText}
             onChange={(event) => setSearchText(event.target.value)}
-            className="w-full h-10 px-3 text-sm border rounded-md border-borderLight"
+            className="h-10 w-full rounded-md border border-slate-200 px-3 text-sm text-slate-700 placeholder:text-slate-400 focus:border-blue-300"
           />
         </div>
       )}
 
       <div className="mb-4">
-        <label className="block mb-1 text-xs font-medium text-textSecondary">
+        <label className="mb-1 block text-xs font-medium text-slate-500">
           Course
         </label>
         <select
           value={selectedCourseId}
           onChange={handleCourseChange}
-          className="w-full h-10 px-3 text-sm border rounded-md border-borderLight"
+          className="h-10 w-full rounded-md border border-slate-200 px-3 text-sm text-slate-700 focus:border-blue-300"
         >
           <option value="all">All Courses</option>
           {COURSES.map((course) => (
@@ -124,13 +126,13 @@ const Sidebar = () => {
       </div>
 
       <div className="mb-4">
-        <label className="block mb-1 text-xs font-medium text-textSecondary">
+        <label className="mb-1 block text-xs font-medium text-slate-500">
           Semester
         </label>
         <select
           value={selectedSemester}
           onChange={(event) => setSelectedSemester(event.target.value)}
-          className="w-full h-10 px-3 text-sm border rounded-md border-borderLight"
+          className="h-10 w-full rounded-md border border-slate-200 px-3 text-sm text-slate-700 focus:border-blue-300"
         >
           <option value="all">All Semesters</option>
           {SEMESTERS.map((sem) => (
@@ -143,13 +145,13 @@ const Sidebar = () => {
 
       {selectedCourse?.hasBranches && (
         <div className="mb-4">
-          <label className="block mb-1 text-xs font-medium text-textSecondary">
+          <label className="mb-1 block text-xs font-medium text-slate-500">
             Branch
           </label>
           <select
             value={selectedBranch}
             onChange={handleBranchChange}
-            className="w-full h-10 px-3 text-sm border rounded-md border-borderLight"
+            className="h-10 w-full rounded-md border border-slate-200 px-3 text-sm text-slate-700 focus:border-blue-300"
           >
             <option value="all">All Branches</option>
             {selectedCourse.branches.map((branch) => (
@@ -163,13 +165,13 @@ const Sidebar = () => {
 
       {!isSyllabusPage && (
         <div className="mb-6">
-          <label className="block mb-1 text-xs font-medium text-textSecondary">
+          <label className="mb-1 block text-xs font-medium text-slate-500">
             Subject
           </label>
           <select
             value={selectedSubject}
             onChange={(event) => setSelectedSubject(event.target.value)}
-            className="w-full h-10 px-3 text-sm border rounded-md border-borderLight"
+            className="h-10 w-full rounded-md border border-slate-200 px-3 text-sm text-slate-700 focus:border-blue-300"
           >
             <option value="all">All Subjects</option>
             {subjectOptions.map((subject) => (
@@ -185,7 +187,7 @@ const Sidebar = () => {
         <button
           type="button"
           onClick={applyFilters}
-          className="w-full h-10 text-sm font-medium text-white transition-colors rounded-md bg-primary hover:bg-primary/90"
+          className="h-10 w-full rounded-md bg-blue-600 text-sm font-medium text-white transition-colors hover:bg-blue-700"
         >
           Apply Filters
         </button>
@@ -194,27 +196,27 @@ const Sidebar = () => {
           type="button"
           onClick={handleClearFilters}
           disabled={!hasActiveFilters}
-          className="flex items-center justify-center w-full h-10 gap-2 text-sm font-medium transition-colors border rounded-md border-danger/30 bg-red-50 text-danger hover:bg-red-100 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="flex h-10 w-full items-center justify-center gap-2 rounded-md border border-red-200 bg-red-50 text-sm font-medium text-red-600 transition-colors hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-50"
         >
           <RotateCcw size={16} />
           Clear Filters
         </button>
       </div>
 
-      <hr className="my-6 border-borderLight" />
+      <hr className="my-6 border-slate-200" />
 
       <div>
-        <p className="mb-2 text-xs font-semibold text-textSecondary">
+        <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-500">
           Quick Access
         </p>
-        <ul className="space-y-2 text-sm text-textPrimary">
+        <ul className="space-y-2 text-sm text-slate-700">
           <li>
-            <Link to="/saved" className="hover:text-primary">
+            <Link to="/saved" className="transition-colors hover:text-blue-600">
               Saved Materials
             </Link>
           </li>
           <li>
-            <Link to="/profile" className="hover:text-primary">
+            <Link to="/profile" className="transition-colors hover:text-blue-600">
               My Profile
             </Link>
           </li>
