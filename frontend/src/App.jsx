@@ -9,6 +9,8 @@ import PYQs from "./pages/PYQs";
 import StudyMaterials from "./pages/StudyMaterials";
 import Profile from "./pages/Profile";
 import Syllabus from "./pages/Syllabus";
+import SavedMaterials from "./pages/SavedMaterials";
+import { Toaster } from "react-hot-toast";
 
 // Components
 import Navbar from "./components/Navbar";
@@ -21,6 +23,7 @@ function App() {
   return (
     <FilterProvider>
       <Navbar />
+      <Toaster position="top-right" />
 
       <Routes>
         {/* PUBLIC ROUTES */}
@@ -34,6 +37,7 @@ function App() {
         <Route path="/materials" element={<StudyMaterials />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/syllabus" element={<Syllabus />} />
+        <Route path="/saved" element={<SavedMaterials />} />
 
         {/* FALLBACK */}
         <Route path="*" element={<Navigate to="/" replace />} />
