@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import AdminLayout from "../../components/AdminLayout.jsx";
 import { apiRequest } from "../../services/api.js";
+import toast from "react-hot-toast";
+import { confirmToast } from "../../utils/confirmToast.jsx";
 
 const ManagePYQs = () => {
   const [allPyqs, setAllPyqs] = useState([]);
@@ -59,12 +61,6 @@ const ManagePYQs = () => {
   };
 
   const handleDelete = async (id) => {
-    const confirmDelete = window.confirm(
-      "Are you sure you want to delete this PYQ?",
-    );
-
-    if (!confirmDelete) return;
-
     try {
       await apiRequest(`/admin/pyqs/${id}`, {
         method: "DELETE",
@@ -72,9 +68,17 @@ const ManagePYQs = () => {
 
       setAllPyqs((prev) => prev.filter((p) => p._id !== id));
       setPyqs((prev) => prev.filter((p) => p._id !== id));
+
+      toast.success("PYQ deleted successfully");
     } catch (err) {
-      alert(err.message);
+      toast.error(err.message);
     }
+  };
+
+  const confirmDelete = (id) => {
+    confirmToast("Are you sure you want to delete this PYQ?", () =>
+      handleDelete(id),
+    );
   };
 
   return (
@@ -132,7 +136,7 @@ const ManagePYQs = () => {
 
         <button
           onClick={applyFilters}
-          className="h-10 text-white rounded-md bg-primary md:col-span-1"
+          className="h-10 text-white rounded-md bg-primary"
         >
           Apply Filters
         </button>
@@ -174,7 +178,7 @@ const ManagePYQs = () => {
                   <td>{pyq.year}</td>
                   <td>
                     <button
-                      onClick={() => handleDelete(pyq._id)}
+                      onClick={() => confirmDelete(pyq._id)}
                       className="text-sm font-medium text-danger hover:underline"
                     >
                       Delete
