@@ -69,7 +69,7 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="bg-white border-b border-borderLight">
+    <nav className="border-b border-slate-200 bg-white/95 backdrop-blur">
       <div className="container-page h-[68px] flex items-center justify-between">
         <Link to="/" className="flex items-center gap-2">
           <img src={logo} alt="M Hub Logo" className="object-contain h-12" />
@@ -87,9 +87,7 @@ const Navbar = () => {
               to={item.to}
               className={({ isActive }) =>
                 `text-sm font-medium transition ${
-                  isActive
-                    ? "text-primary"
-                    : "text-textSecondary hover:text-textPrimary"
+                  isActive ? "text-blue-600" : "text-slate-600 hover:text-slate-900"
                 }`
               }
             >
@@ -123,12 +121,12 @@ const Navbar = () => {
                     className="object-cover border rounded-full w-9 h-9"
                   />
                 ) : (
-                  <div className="flex items-center justify-center border rounded-full w-9 h-9 bg-gray-100 border-borderLight">
-                    <User className="w-5 h-5 text-gray-500" />
+                  <div className="flex items-center justify-center w-9 h-9 border rounded-full border-slate-200 bg-slate-100">
+                    <User className="w-5 h-5 text-slate-500" />
                   </div>
                 )}
 
-                <span className="hidden text-sm font-medium md:block text-textPrimary">
+                <span className="hidden text-sm font-medium text-slate-900 md:block">
                   {user?.name}
                 </span>
               </button>
@@ -138,7 +136,7 @@ const Navbar = () => {
                   id="navbar-user-menu"
                   role="menu"
                   aria-label="User menu"
-                  className="absolute right-0 z-50 w-44 py-1 mt-2 bg-white border rounded-md shadow-lg border-borderLight"
+                  className="absolute right-0 z-50 w-44 py-1 mt-2 bg-white border rounded-md shadow-lg border-slate-200"
                 >
                   <button
                     ref={firstMenuItemRef}
@@ -148,7 +146,7 @@ const Navbar = () => {
                       setIsMenuOpen(false);
                       navigate("/profile");
                     }}
-                    className="w-full px-4 py-2 text-sm text-left text-textPrimary hover:bg-gray-50"
+                    className="w-full px-4 py-2 text-sm text-left text-slate-700 hover:bg-slate-50"
                   >
                     Profile
                   </button>
@@ -160,7 +158,7 @@ const Navbar = () => {
                       setIsMenuOpen(false);
                       logout();
                     }}
-                    className="w-full px-4 py-2 text-sm text-left text-red-500 hover:bg-gray-50"
+                    className="w-full px-4 py-2 text-sm text-left text-red-600 hover:bg-red-50"
                   >
                     Logout
                   </button>
@@ -171,14 +169,14 @@ const Navbar = () => {
             <>
               <NavLink
                 to="/login"
-                className="text-sm font-medium text-textSecondary hover:text-textPrimary"
+                className="text-sm font-medium text-slate-600 hover:text-slate-900"
               >
                 Login
               </NavLink>
 
               <NavLink
                 to="/register"
-                className="px-4 py-2 text-sm font-medium text-white rounded-md bg-primary hover:opacity-90"
+                className="px-4 py-2 text-sm font-medium text-white rounded-md bg-blue-600 hover:bg-blue-700"
               >
                 Register
               </NavLink>

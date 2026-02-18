@@ -16,8 +16,8 @@ const SaveResourceButton = ({ saved, loading, onToggle }) => {
       aria-label={saved ? "Unsave resource" : "Save resource"}
       className={`inline-flex h-8 w-8 items-center justify-center rounded-full border transition ${
         saved
-          ? "border-primary bg-blue-50 text-primary"
-          : "border-borderLight bg-white text-textSecondary hover:text-primary"
+          ? "border-yellow-200 bg-yellow-50 text-yellow-400 hover:bg-yellow-100"
+          : "border-slate-200 bg-white text-slate-400 hover:border-slate-300 hover:text-slate-600"
       } ${loading ? "cursor-not-allowed opacity-70" : ""}`}
     >
       {loading ? (

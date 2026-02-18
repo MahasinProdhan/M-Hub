@@ -8,7 +8,7 @@ const OrganizerCard = ({
   onToggleSave,
 }) => {
   return (
-    <div className="flex flex-col justify-between p-5 transition card hover:shadow-card">
+    <div className="flex flex-col justify-between p-5 transition border rounded-2xl border-slate-200 bg-white hover:border-purple-200 hover:shadow-md">
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-start gap-3">
           <div className="flex items-center justify-center w-10 h-10 text-purple-600 rounded-lg bg-purple-50">
@@ -16,10 +16,10 @@ const OrganizerCard = ({
           </div>
 
           <div>
-            <h3 className="text-base font-semibold leading-snug text-textPrimary">
+            <h3 className="text-base font-semibold leading-snug text-slate-900">
               {organizer.title}
             </h3>
-            <p className="text-sm text-textSecondary">
+            <p className="text-sm text-slate-600">
               {organizer.subject} - {organizer.year}
             </p>
           </div>
@@ -32,7 +32,7 @@ const OrganizerCard = ({
         />
       </div>
 
-      <div className="mt-4 space-y-1 text-sm text-textSecondary">
+      <div className="mt-4 space-y-1 text-sm text-slate-600">
         <p>
           Semester {organizer.semester} - {organizer.course.toUpperCase()}
         </p>
@@ -40,7 +40,7 @@ const OrganizerCard = ({
       </div>
 
       <div className="flex items-center justify-between mt-5">
-        <span className="px-2 py-1 text-xs bg-gray-100 rounded text-textSecondary">
+        <span className="px-2 py-1 text-xs rounded bg-slate-100 text-slate-600">
           {organizer.fileType}
         </span>
 
@@ -48,7 +48,7 @@ const OrganizerCard = ({
           href={organizer.driveLink}
           target="_blank"
           rel="noopener noreferrer"
-          className="text-sm font-medium text-primary hover:underline"
+          className="text-sm font-medium text-blue-600 hover:underline"
         >
           View
         </a>

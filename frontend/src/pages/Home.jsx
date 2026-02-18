@@ -8,7 +8,7 @@ import DashboardSkeleton from "../components/skeletons/DashboardSkeleton.jsx";
 const TYPE_CONFIG = {
   pyq: {
     label: "PYQ",
-    badgeClass: "bg-blue-100 text-primary",
+    badgeClass: "bg-blue-100 text-blue-700",
   },
   material: {
     label: "Notes",
@@ -111,14 +111,14 @@ const Home = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-appBg">
+    <div className="min-h-screen bg-slate-50">
       {!isLoggedIn && (
         <div className="py-16 container-page">
           <div className="max-w-3xl mx-auto text-center">
-            <h1 className="text-4xl font-semibold text-textPrimary">
+            <h1 className="text-4xl font-semibold text-slate-900">
               Welcome to M Hub
             </h1>
-            <p className="mt-4 text-textSecondary">
+            <p className="mt-4 text-slate-600">
               A centralized platform to access PYQs, study materials, organizers,
               and syllabus under MAKAUT.
             </p>
@@ -126,14 +126,14 @@ const Home = () => {
             <div className="flex justify-center gap-4 mt-8">
               <a
                 href="/login"
-                className="px-6 py-3 text-sm font-medium text-white rounded-lg bg-primary"
+                className="px-6 py-3 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700"
               >
                 Login to Continue
               </a>
 
               <a
                 href="/"
-                className="px-6 py-3 text-sm font-medium border rounded-lg border-borderLight text-textPrimary"
+                className="px-6 py-3 text-sm font-medium border rounded-lg border-slate-200 text-slate-700 hover:bg-slate-100"
               >
                 Explore as Guest
               </a>
@@ -149,11 +149,11 @@ const Home = () => {
             <DashboardSkeleton />
           ) : (
             <main className="flex-1 p-8 transition-opacity duration-300 opacity-100">
-              <div className="p-6 border rounded-xl bg-gradient-to-r from-blue-50 to-white border-borderLight">
-                <h2 className="text-2xl font-semibold text-textPrimary">
+              <div className="p-6 border shadow-sm rounded-2xl bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-100">
+                <h2 className="text-2xl font-semibold text-slate-900">
                   Welcome back, {userName}
                 </h2>
-                <p className="max-w-xl mt-2 text-sm text-textSecondary">
+                <p className="max-w-xl mt-2 text-sm text-slate-600">
                   Quickly access academic resources like PYQs, study materials,
                   organizers, and syllabus for your semester.
                 </p>
@@ -187,18 +187,18 @@ const Home = () => {
 
               <section className="mt-14">
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg font-semibold text-textPrimary">Recently Added</h3>
-                  <span className="text-xs text-textSecondary">Updated automatically</span>
+                  <h3 className="text-lg font-semibold text-slate-900">Recently Added</h3>
+                  <span className="text-xs text-slate-500">Updated automatically</span>
                 </div>
 
                 {recentError && (
-                  <div className="p-4 text-sm border rounded-lg text-danger border-danger/30 bg-red-50">
+                  <div className="p-4 text-sm text-red-600 border border-red-200 rounded-lg bg-red-50">
                     {recentError}
                   </div>
                 )}
 
                 {!recentError && recentItems.length === 0 && (
-                  <div className="p-4 text-sm card text-textSecondary">
+                  <div className="p-4 text-sm border rounded-xl border-slate-200 bg-white text-slate-600">
                     No recent resources available right now.
                   </div>
                 )}
@@ -211,7 +211,7 @@ const Home = () => {
                         href={item.href}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex items-start justify-between gap-3 p-4 transition group card hover:shadow-card"
+                        className="group flex items-start justify-between gap-3 rounded-xl border border-slate-200 bg-white p-4 transition-all hover:border-blue-200 hover:shadow-md"
                       >
                         <div className="min-w-0">
                           <span
@@ -222,15 +222,15 @@ const Home = () => {
                             {TYPE_CONFIG[item.type].label}
                           </span>
 
-                          <p className="mt-2 text-sm font-medium truncate text-textPrimary">
+                          <p className="mt-2 text-sm font-medium truncate text-slate-900">
                             {item.title}
                           </p>
-                          <p className="mt-1 text-sm truncate text-textSecondary">
+                          <p className="mt-1 text-sm truncate text-slate-600">
                             {item.meta}
                           </p>
                         </div>
 
-                        <ArrowUpRight className="w-4 h-4 mt-1 transition-all -translate-x-1 opacity-0 text-textSecondary group-hover:translate-x-0 group-hover:opacity-100 group-hover:text-primary" />
+                        <ArrowUpRight className="w-4 h-4 mt-1 transition-all -translate-x-1 opacity-0 text-slate-500 group-hover:translate-x-0 group-hover:opacity-100 group-hover:text-blue-600" />
                       </a>
                     ))}
                   </div>
