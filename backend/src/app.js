@@ -12,6 +12,8 @@ import adminPYQRoutes from "./routes/admin/pyq.admin.routes.js";
 import adminMaterialRoutes from "./routes/admin/material.admin.routes.js";
 import adminOrganizerRoutes from "./routes/admin/organizer.admin.routes.js";
 import adminSyllabusRoutes from "./routes/admin/syllabus.admin.routes.js";
+import adminStatsRoutes from "./routes/admin/stats.admin.routes.js";
+import adminUserRoutes from "./routes/admin/user.admin.routes.js";
 
 const app = express();
 
@@ -30,6 +32,8 @@ app.use("/api/admin", adminPYQRoutes);
 app.use("/api/admin", adminMaterialRoutes);
 app.use("/api/admin", adminOrganizerRoutes);
 app.use("/api/admin", adminSyllabusRoutes);
+app.use("/api/admin", adminStatsRoutes);
+app.use("/api/admin", adminUserRoutes);
 
 // test route
 app.get("/", (req, res) => {
