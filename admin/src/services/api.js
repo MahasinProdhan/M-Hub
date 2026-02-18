@@ -12,7 +12,15 @@ export const apiRequest = async (endpoint, options = {}) => {
     },
   });
 
-  const data = await res.json();
+  // SAFELY read response
+  const text = await res.text();
+
+  let data;
+  try {
+    data = text ? JSON.parse(text) : {};
+  } catch {
+    throw new Error("Server returned invalid response");
+  }
 
   if (!res.ok) {
     throw new Error(data.message || "Something went wrong");

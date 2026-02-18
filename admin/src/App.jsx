@@ -6,12 +6,15 @@ import AddPYQ from "./pages/pyqs/AddPYQ";
 import AddMaterial from "./pages/materials/AddMaterial";
 import AddOrganizer from "./pages/organizers/AddOrganizer";
 import AddSyllabus from "./pages/syllabus/AddSyllabus";
+import ManagePYQs from "./pages/pyqs/ManagePYQs";
+import ManageMaterials from "./pages/materials/ManageMaterials";
+import ManageOrganizers from "./pages/organizers/ManageOrganizers";
+import ManageSyllabus from "./pages/syllabus/ManageSyllabus";
 
 const App = () => {
   return (
     <Routes>
       <Route path="/login" element={<Login />} />
-
       <Route
         path="/dashboard"
         element={
@@ -20,7 +23,6 @@ const App = () => {
           </ProtectedAdmin>
         }
       />
-
       {/* Placeholder routes (next steps) */}
       <Route
         path="/pyqs/add"
@@ -30,7 +32,6 @@ const App = () => {
           </ProtectedAdmin>
         }
       />
-
       <Route
         path="/materials/add"
         element={
@@ -39,7 +40,6 @@ const App = () => {
           </ProtectedAdmin>
         }
       />
-
       <Route
         path="/organizers/add"
         element={
@@ -48,7 +48,6 @@ const App = () => {
           </ProtectedAdmin>
         }
       />
-
       <Route
         path="/syllabus/add"
         element={
@@ -57,7 +56,39 @@ const App = () => {
           </ProtectedAdmin>
         }
       />
+      <Route
+        path="/pyqs/manage"
+        element={
+          <ProtectedAdmin>
+            <ManagePYQs />
+          </ProtectedAdmin>
+        }
+      />
+      <Route
+        path="/materials/manage"
+        element={
+          <ProtectedAdmin>
+            <ManageMaterials />
+          </ProtectedAdmin>
+        }
+      />
+      <Route
+        path="/organizers/manage"
+        element={
+          <ProtectedAdmin>
+            <ManageOrganizers />
+          </ProtectedAdmin>
+        }
+      />
 
+      <Route
+        path="/syllabus/manage"
+        element={
+          <ProtectedAdmin>
+            <ManageSyllabus />
+          </ProtectedAdmin>
+        }
+      />
       <Route path="*" element={<Navigate to="/dashboard" replace />} />
     </Routes>
   );

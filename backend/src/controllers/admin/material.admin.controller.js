@@ -1,5 +1,6 @@
 import Material from "../../models/material.model.js";
 
+// CREATE STUDY MATERIAL
 export const createMaterial = async (req, res, next) => {
   try {
     const {
@@ -41,6 +42,27 @@ export const createMaterial = async (req, res, next) => {
     res.status(201).json({
       message: "Study material created successfully",
       material,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// DELETE STUDY MATERIAL
+export const deleteMaterial = async (req, res, next) => {
+  try {
+    const material = await Material.findById(req.params.id);
+
+    if (!material) {
+      return res.status(404).json({
+        message: "Study material not found",
+      });
+    }
+
+    await material.deleteOne();
+
+    res.status(200).json({
+      message: "Study material deleted successfully",
     });
   } catch (error) {
     next(error);

@@ -1,5 +1,6 @@
 import Organizer from "../../models/organizer.model.js";
 
+// CREATE ORGANIZER
 export const createOrganizer = async (req, res, next) => {
   try {
     const {
@@ -41,6 +42,27 @@ export const createOrganizer = async (req, res, next) => {
     res.status(201).json({
       message: "Organizer created successfully",
       organizer,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// DELETE ORGANIZER
+export const deleteOrganizer = async (req, res, next) => {
+  try {
+    const organizer = await Organizer.findById(req.params.id);
+
+    if (!organizer) {
+      return res.status(404).json({
+        message: "Organizer not found",
+      });
+    }
+
+    await organizer.deleteOne();
+
+    res.status(200).json({
+      message: "Organizer deleted successfully",
     });
   } catch (error) {
     next(error);
