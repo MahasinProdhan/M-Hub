@@ -1,13 +1,26 @@
-import { createContext, useContext, useState, useEffect } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { toast } from "react-hot-toast";
+import {
+  AUTH_EXPIRED_EVENT,
+  resetSessionExpiryHandling,
+} from "../services/api.js";
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
+  const navigate = useNavigate();
+  const location = useLocation();
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Restore session
   useEffect(() => {
     const storedToken = localStorage.getItem("token");
     const storedUser = localStorage.getItem("user");
@@ -20,25 +33,44 @@ export const AuthProvider = ({ children }) => {
     setLoading(false);
   }, []);
 
-  const login = (token, user) => {
-    localStorage.setItem("token", token);
-    localStorage.setItem("user", JSON.stringify(user));
-    setToken(token);
-    setUser(user);
-  };
+  const login = useCallback((nextToken, nextUser) => {
+    localStorage.setItem("token", nextToken);
+    localStorage.setItem("user", JSON.stringify(nextUser));
+    setToken(nextToken);
+    setUser(nextUser);
+    resetSessionExpiryHandling();
+  }, []);
 
-  // 🔥 IMPORTANT FIX
-  const updateUser = (updatedUser) => {
+  const updateUser = useCallback((updatedUser) => {
     setUser(updatedUser);
     localStorage.setItem("user", JSON.stringify(updatedUser));
-  };
+  }, []);
 
-  const logout = () => {
+  const logout = useCallback(() => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     setToken(null);
     setUser(null);
-  };
+  }, []);
+
+  useEffect(() => {
+    const handleSessionExpired = (event) => {
+      const message =
+        event?.detail?.message || "Session expired. Please log in again.";
+
+      logout();
+      toast.error(message);
+
+      if (location.pathname !== "/login") {
+        navigate("/login", { replace: true });
+      }
+    };
+
+    window.addEventListener(AUTH_EXPIRED_EVENT, handleSessionExpired);
+    return () => {
+      window.removeEventListener(AUTH_EXPIRED_EVENT, handleSessionExpired);
+    };
+  }, [location.pathname, logout, navigate]);
 
   return (
     <AuthContext.Provider

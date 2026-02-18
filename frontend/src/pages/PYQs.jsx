@@ -3,9 +3,11 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import Sidebar from "../components/Sidebar";
 import PYQCard from "../components/PYQCard";
+import ListSkeleton from "../components/skeletons/ListSkeleton.jsx";
 import { useFilters } from "../context/FilterContext";
 import { useAuth } from "../context/AuthContext.jsx";
 import { useSavedResources } from "../context/SavedResourcesContext.jsx";
+import { apiRequest } from "../services/api.js";
 
 const PYQs = () => {
   const { filters } = useFilters();
@@ -30,11 +32,7 @@ const PYQs = () => {
         if (filters.subject !== "all") params.append("subject", filters.subject);
         if (filters.search) params.append("search", filters.search);
 
-        const response = await fetch(
-          `http://localhost:5000/api/pyqs?${params.toString()}`,
-        );
-
-        const result = await response.json();
+        const result = await apiRequest(`/pyqs?${params.toString()}`);
 
         setPyqs(result.data);
         setError(null);
@@ -76,10 +74,11 @@ const PYQs = () => {
           </p>
         </div>
 
-        {loading && <p>Loading PYQs...</p>}
-        {error && <p className="text-red-500">{error}</p>}
-
-        {!loading && !error && pyqs.length > 0 ? (
+        {loading ? (
+          <ListSkeleton count={6} />
+        ) : error ? (
+          <p className="text-red-500">{error}</p>
+        ) : pyqs.length > 0 ? (
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {pyqs.map((pyq) => (
               <PYQCard
@@ -92,12 +91,9 @@ const PYQs = () => {
             ))}
           </div>
         ) : (
-          !loading &&
-          !error && (
-            <div className="p-6 text-center card text-textSecondary">
-              No PYQs found for selected filters.
-            </div>
-          )
+          <div className="p-6 text-center card text-textSecondary">
+            No PYQs found for selected filters.
+          </div>
         )}
       </main>
     </div>

@@ -56,6 +56,7 @@ const EditProfileModal = ({ onClose }) => {
       updateUser(res.user);
       onClose();
     } catch (err) {
+      if (err?.isAuthExpired) return;
       setError(err.message || "Profile update failed");
     } finally {
       setLoading(false);

@@ -74,7 +74,9 @@ export const SavedResourcesProvider = ({ children }) => {
       const normalizedItems = items.map(normalizeSavedItem).filter(Boolean);
       setSavedItems(normalizedItems);
     } catch (error) {
-      toast.error(error.message || "Failed to load saved materials");
+      if (!error?.isAuthExpired) {
+        toast.error(error.message || "Failed to load saved materials");
+      }
     } finally {
       setLoading(false);
       setInitialized(true);
@@ -169,7 +171,9 @@ export const SavedResourcesProvider = ({ children }) => {
           return withoutItem;
         });
 
-        toast.error(error.message || "Failed to update saved materials");
+        if (!error?.isAuthExpired) {
+          toast.error(error.message || "Failed to update saved materials");
+        }
       } finally {
         setPending(key, false);
       }

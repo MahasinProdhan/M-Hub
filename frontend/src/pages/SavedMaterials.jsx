@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Sidebar from "../components/Sidebar";
+import ListSkeleton from "../components/skeletons/ListSkeleton.jsx";
 import { useAuth } from "../context/AuthContext.jsx";
 import { useSavedResources } from "../context/SavedResourcesContext.jsx";
 
@@ -40,8 +41,12 @@ const SavedMaterials = () => {
     return (
       <div className="flex min-h-screen bg-appBg">
         <Sidebar />
-        <main className="flex items-center justify-center flex-1 p-8">
-          <p className="text-textSecondary">Loading saved materials...</p>
+        <main className="flex-1 p-8">
+          <div className="mb-6 animate-pulse">
+            <div className="w-48 h-7 rounded bg-gray-200" />
+            <div className="w-32 h-4 mt-2 rounded bg-gray-200" />
+          </div>
+          <ListSkeleton count={4} layout="list" />
         </main>
       </div>
     );
@@ -65,9 +70,9 @@ const SavedMaterials = () => {
           </p>
         </div>
 
-        {loading && <p className="mb-4 text-textSecondary">Refreshing saved list...</p>}
-
-        {visibleItems.length === 0 ? (
+        {loading && visibleItems.length === 0 ? (
+          <ListSkeleton count={4} layout="list" />
+        ) : visibleItems.length === 0 ? (
           <div className="p-6 text-center card text-textSecondary">
             You have no saved resources yet.
           </div>
