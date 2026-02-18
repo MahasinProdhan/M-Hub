@@ -51,6 +51,9 @@ const ManageUsers = () => {
               <tr className="text-left border-b text-textSecondary">
                 <th className="py-2">Name</th>
                 <th>Email</th>
+                <th>College</th>
+                <th>Course</th>
+                <th>Branch</th>
                 <th>Role</th>
                 <th>Joined</th>
               </tr>
@@ -63,6 +66,9 @@ const ManageUsers = () => {
                     {u.name}
                   </td>
                   <td>{u.email}</td>
+                  <td>{u.college || "—"}</td>
+                  <td className="uppercase">{u.course || "—"}</td>
+                  <td>{u.branch || "—"}</td>
                   <td>
                     <span className="px-2 py-1 text-xs rounded-full bg-blue-50 text-primary">
                       {u.role}

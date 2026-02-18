@@ -7,15 +7,27 @@ import User from "../models/user.model.js";
  */
 export const registerUser = async (req, res, next) => {
   try {
-    const { name, email, password } = req.body;
+    const { name, email, password, college, course, branch } = req.body;
 
-    if (!name || !email || !password) {
-      return res.status(400).json({ message: "All fields are required" });
+    // Basic validation
+    if (!name || !email || !password || !college || !course) {
+      return res.status(400).json({
+        message: "Name, email, password, college and course are required",
+      });
+    }
+
+    // BTech requires branch
+    if (course === "btech" && !branch) {
+      return res.status(400).json({
+        message: "Branch is required for BTech students",
+      });
     }
 
     const existingUser = await User.findOne({ email });
     if (existingUser) {
-      return res.status(409).json({ message: "User already exists" });
+      return res.status(409).json({
+        message: "User already exists",
+      });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -24,6 +36,9 @@ export const registerUser = async (req, res, next) => {
       name,
       email,
       password: hashedPassword,
+      college,
+      course,
+      branch: course === "btech" ? branch : null,
       role: "user", // force user role
     });
 
@@ -33,6 +48,9 @@ export const registerUser = async (req, res, next) => {
         id: user._id,
         name: user.name,
         email: user.email,
+        college: user.college,
+        course: user.course,
+        branch: user.branch,
         role: user.role,
       },
     });
@@ -49,17 +67,23 @@ export const loginUser = async (req, res, next) => {
     const { email, password } = req.body;
 
     if (!email || !password) {
-      return res.status(400).json({ message: "Email and password required" });
+      return res.status(400).json({
+        message: "Email and password are required",
+      });
     }
 
     const user = await User.findOne({ email });
     if (!user) {
-      return res.status(401).json({ message: "Invalid credentials" });
+      return res.status(401).json({
+        message: "Invalid credentials",
+      });
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      return res.status(401).json({ message: "Invalid credentials" });
+      return res.status(401).json({
+        message: "Invalid credentials",
+      });
     }
 
     const token = jwt.sign(
@@ -75,6 +99,9 @@ export const loginUser = async (req, res, next) => {
         id: user._id,
         name: user.name,
         email: user.email,
+        college: user.college,
+        course: user.course,
+        branch: user.branch,
         role: user.role,
       },
     });

@@ -7,7 +7,7 @@ const Profile = () => {
   const { user, isLoggedIn, logout, loading } = useAuth();
   const navigate = useNavigate();
 
-  // Soft UX protection
+  // Soft route protection
   useEffect(() => {
     if (!loading && !isLoggedIn) {
       navigate("/login");
@@ -34,7 +34,7 @@ const Profile = () => {
               My Profile
             </h1>
             <p className="text-sm text-textSecondary">
-              Manage your personal information and contact details.
+              View your account and academic details
             </p>
           </div>
 
@@ -71,32 +71,46 @@ const Profile = () => {
             </div>
           </div>
 
-          {/* Basic Info */}
+          {/* Academic Info */}
           <div className="p-6 border rounded-lg border-borderLight">
             <h3 className="mb-4 text-sm font-semibold tracking-wide text-textSecondary">
-              BASIC INFORMATION
+              ACADEMIC INFORMATION
             </h3>
 
             <div className="space-y-4">
               <div>
-                <p className="text-xs text-textSecondary">ACCOUNT TYPE</p>
+                <p className="text-xs text-textSecondary">COLLEGE</p>
                 <p className="text-sm font-medium text-textPrimary">
-                  {user.role === "admin" ? "Administrator" : "Student"}
+                  {user.college || "—"}
                 </p>
               </div>
 
               <div>
-                <p className="text-xs text-textSecondary">STATUS</p>
-                <p className="text-sm font-medium text-green-600">Active</p>
+                <p className="text-xs text-textSecondary">COURSE</p>
+                <p className="text-sm font-medium uppercase text-textPrimary">
+                  {user.course || "—"}
+                </p>
               </div>
+
+              {user.course === "btech" && (
+                <div>
+                  <p className="text-xs text-textSecondary">BRANCH</p>
+                  <p className="text-sm font-medium text-textPrimary">
+                    {user.branch}
+                  </p>
+                </div>
+              )}
             </div>
           </div>
         </div>
 
         {/* Actions */}
         <div className="flex items-center justify-between mt-8">
-          <button className="px-6 py-2 text-sm font-medium border rounded-md border-borderLight text-textPrimary hover:bg-gray-50">
-            Edit (Coming Soon)
+          <button
+            disabled
+            className="px-6 py-2 text-sm font-medium border rounded-md cursor-not-allowed border-borderLight text-textMuted"
+          >
+            Edit Profile (Coming Soon)
           </button>
 
           <button
@@ -104,7 +118,7 @@ const Profile = () => {
               logout();
               navigate("/");
             }}
-            className="px-6 py-2 text-sm font-medium text-white bg-red-500 rounded-md hover:bg-red-600"
+            className="px-6 py-2 text-sm font-medium text-white rounded-md bg-danger hover:bg-red-600"
           >
             Logout
           </button>

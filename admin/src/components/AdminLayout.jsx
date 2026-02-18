@@ -1,27 +1,54 @@
 import { Navigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext.jsx";
+import logo from "../assets/icons/logo2.png";
 
 const AdminLayout = ({ children }) => {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
 
-  // Protect admin routes
   if (!user || user.role !== "admin") {
     return <Navigate to="/login" replace />;
   }
 
   return (
-    <div className="min-h-screen bg-appBg">
-      {/* Top Bar */}
-      <header className="bg-white border-b border-borderLight">
-        <div className="container-page h-[64px] flex items-center">
-          <h1 className="text-lg font-semibold text-textPrimary">
-            M Hub Admin
-          </h1>
+    <div className="min-h-screen bg-gray-50">
+      {/* Top Navigation */}
+      <header className="sticky top-0 z-50 bg-white border-b shadow-sm border-borderLight">
+        <div className="container-page h-[70px] flex items-center justify-between">
+          {/* Logo + Branding */}
+          <div className="flex items-center gap-4">
+            <img
+              src={logo}
+              alt="M Hub Logo"
+              className="object-contain w-auto h-14"
+            />
+
+            <div className="flex flex-col leading-tight">
+              <span className="text-lg font-semibold text-textPrimary">
+                M Hub Admin
+              </span>
+              <span className="text-xs text-textSecondary">Control Panel</span>
+            </div>
+          </div>
+
+          {/* Right Section */}
+          <div className="flex items-center gap-6">
+            <div className="hidden text-sm sm:block text-textSecondary">
+              Welcome,{" "}
+              <span className="font-medium text-textPrimary">{user?.name}</span>
+            </div>
+
+            <button
+              onClick={logout}
+              className="px-4 py-2 text-sm font-semibold text-white transition-all duration-300 rounded-lg bg-danger hover:opacity-90 hover:shadow-md"
+            >
+              Logout
+            </button>
+          </div>
         </div>
       </header>
 
       {/* Page Content */}
-      <main className="py-8 container-page">{children}</main>
+      <main className="py-5 container-page">{children}</main>
     </div>
   );
 };
