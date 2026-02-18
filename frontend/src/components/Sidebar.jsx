@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { useLocation } from "react-router-dom"; // ✅ NEW
+import { Link, useLocation } from "react-router-dom";
 import { RotateCcw } from "lucide-react";
 import { COURSES, SEMESTERS, SUBJECTS } from "../utils/constants";
 import { useFilters } from "../context/FilterContext";
@@ -11,18 +11,14 @@ const BRANCH_TO_SUBJECT_KEY = {
 
 const Sidebar = () => {
   const { setFilters } = useFilters();
-  const location = useLocation(); // ✅ NEW
+  const location = useLocation();
 
-  // 🔍 hide search & subject on syllabus page
   const isSyllabusPage = location.pathname === "/syllabus";
 
-  // existing local states
   const [selectedCourseId, setSelectedCourseId] = useState("all");
   const [selectedSemester, setSelectedSemester] = useState("all");
   const [selectedBranch, setSelectedBranch] = useState("all");
   const [selectedSubject, setSelectedSubject] = useState("all");
-
-  // 🔍 SEARCH: local search state
   const [searchText, setSearchText] = useState("");
 
   const selectedCourse = useMemo(() => {
@@ -45,16 +41,15 @@ const Sidebar = () => {
     return [...new Set([...SUBJECTS.common, ...branchSubjects])];
   }, [selectedCourse, selectedBranch]);
 
-  const handleCourseChange = (e) => {
-    const value = e.target.value;
+  const handleCourseChange = (event) => {
+    const value = event.target.value;
     setSelectedCourseId(value);
-
     setSelectedBranch("all");
     setSelectedSubject("all");
   };
 
-  const handleBranchChange = (e) => {
-    setSelectedBranch(e.target.value);
+  const handleBranchChange = (event) => {
+    setSelectedBranch(event.target.value);
     setSelectedSubject("all");
   };
 
@@ -63,8 +58,8 @@ const Sidebar = () => {
       course: selectedCourseId,
       semester: selectedSemester,
       branch: selectedBranch,
-      subject: isSyllabusPage ? "all" : selectedSubject, // ✅ SAFE
-      search: isSyllabusPage ? "" : searchText, // ✅ SAFE
+      subject: isSyllabusPage ? "all" : selectedSubject,
+      search: isSyllabusPage ? "" : searchText,
     });
   };
 
@@ -95,7 +90,6 @@ const Sidebar = () => {
     <aside className="w-[280px] min-h-screen bg-white border-r border-borderLight p-6 hidden md:block">
       <h2 className="mb-4 text-sm font-semibold text-textPrimary">Filters</h2>
 
-      {/* 🔍 SEARCH (HIDDEN ON SYLLABUS) */}
       {!isSyllabusPage && (
         <div className="mb-4">
           <label className="block mb-1 text-xs font-medium text-textSecondary">
@@ -105,13 +99,12 @@ const Sidebar = () => {
             type="text"
             placeholder="Search subject or title..."
             value={searchText}
-            onChange={(e) => setSearchText(e.target.value)}
+            onChange={(event) => setSearchText(event.target.value)}
             className="w-full h-10 px-3 text-sm border rounded-md border-borderLight"
           />
         </div>
       )}
 
-      {/* Course */}
       <div className="mb-4">
         <label className="block mb-1 text-xs font-medium text-textSecondary">
           Course
@@ -130,14 +123,13 @@ const Sidebar = () => {
         </select>
       </div>
 
-      {/* Semester */}
       <div className="mb-4">
         <label className="block mb-1 text-xs font-medium text-textSecondary">
           Semester
         </label>
         <select
           value={selectedSemester}
-          onChange={(e) => setSelectedSemester(e.target.value)}
+          onChange={(event) => setSelectedSemester(event.target.value)}
           className="w-full h-10 px-3 text-sm border rounded-md border-borderLight"
         >
           <option value="all">All Semesters</option>
@@ -149,7 +141,6 @@ const Sidebar = () => {
         </select>
       </div>
 
-      {/* Branch */}
       {selectedCourse?.hasBranches && (
         <div className="mb-4">
           <label className="block mb-1 text-xs font-medium text-textSecondary">
@@ -170,7 +161,6 @@ const Sidebar = () => {
         </div>
       )}
 
-      {/* Subject (HIDDEN ON SYLLABUS) */}
       {!isSyllabusPage && (
         <div className="mb-6">
           <label className="block mb-1 text-xs font-medium text-textSecondary">
@@ -178,7 +168,7 @@ const Sidebar = () => {
           </label>
           <select
             value={selectedSubject}
-            onChange={(e) => setSelectedSubject(e.target.value)}
+            onChange={(event) => setSelectedSubject(event.target.value)}
             className="w-full h-10 px-3 text-sm border rounded-md border-borderLight"
           >
             <option value="all">All Subjects</option>
@@ -218,8 +208,16 @@ const Sidebar = () => {
           Quick Access
         </p>
         <ul className="space-y-2 text-sm text-textPrimary">
-          <li className="cursor-pointer hover:text-primary">Saved Materials</li>
-          <li className="cursor-pointer hover:text-primary">My Downloads</li>
+          <li>
+            <Link to="/saved" className="hover:text-primary">
+              Saved Materials
+            </Link>
+          </li>
+          <li>
+            <Link to="/profile" className="hover:text-primary">
+              My Profile
+            </Link>
+          </li>
         </ul>
       </div>
     </aside>

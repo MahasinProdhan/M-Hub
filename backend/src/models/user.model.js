@@ -1,4 +1,19 @@
-﻿import mongoose from "mongoose";
+import mongoose from "mongoose";
+
+const savedResourceSchema = new mongoose.Schema(
+  {
+    resourceType: {
+      type: String,
+      enum: ["pyq", "material", "organizer"],
+      required: true,
+    },
+    resourceId: {
+      type: mongoose.Schema.Types.ObjectId,
+      required: true,
+    },
+  },
+  { _id: false },
+);
 
 const userSchema = new mongoose.Schema(
   {
@@ -48,6 +63,11 @@ const userSchema = new mongoose.Schema(
     avatar: {
       type: String,
       default: "",
+    },
+
+    savedResources: {
+      type: [savedResourceSchema],
+      default: [],
     },
   },
   { timestamps: true },
