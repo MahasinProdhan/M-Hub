@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import AdminLayout from "../../components/AdminLayout.jsx";
 import { apiRequest } from "../../services/api.js";
+import toast from "react-hot-toast";
+import { confirmToast } from "../../utils/confirmToast.jsx";
 
 const ManageSyllabus = () => {
   const [allSyllabus, setAllSyllabus] = useState([]);
@@ -47,12 +49,6 @@ const ManageSyllabus = () => {
   };
 
   const handleDelete = async (id) => {
-    const confirmDelete = window.confirm(
-      "Are you sure you want to delete this syllabus?",
-    );
-
-    if (!confirmDelete) return;
-
     try {
       await apiRequest(`/admin/syllabus/${id}`, {
         method: "DELETE",
@@ -60,9 +56,17 @@ const ManageSyllabus = () => {
 
       setAllSyllabus((prev) => prev.filter((s) => s._id !== id));
       setSyllabus((prev) => prev.filter((s) => s._id !== id));
+
+      toast.success("Syllabus deleted successfully");
     } catch (err) {
-      alert(err.message);
+      toast.error(err.message);
     }
+  };
+
+  const confirmDelete = (id) => {
+    confirmToast("Are you sure you want to delete this syllabus?", () =>
+      handleDelete(id),
+    );
   };
 
   return (
@@ -148,7 +152,7 @@ const ManageSyllabus = () => {
                   <td>{s.semester}</td>
                   <td>
                     <button
-                      onClick={() => handleDelete(s._id)}
+                      onClick={() => confirmDelete(s._id)}
                       className="text-sm font-medium text-danger hover:underline"
                     >
                       Delete

@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import AdminLayout from "../../components/AdminLayout.jsx";
 import { apiRequest } from "../../services/api.js";
+import toast from "react-hot-toast";
+import { confirmToast } from "../../utils/confirmToast.jsx";
 
 const ManageOrganizers = () => {
   const [allOrganizers, setAllOrganizers] = useState([]);
@@ -59,12 +61,6 @@ const ManageOrganizers = () => {
   };
 
   const handleDelete = async (id) => {
-    const confirmDelete = window.confirm(
-      "Are you sure you want to delete this organizer?",
-    );
-
-    if (!confirmDelete) return;
-
     try {
       await apiRequest(`/admin/organizers/${id}`, {
         method: "DELETE",
@@ -72,9 +68,17 @@ const ManageOrganizers = () => {
 
       setAllOrganizers((prev) => prev.filter((o) => o._id !== id));
       setOrganizers((prev) => prev.filter((o) => o._id !== id));
+
+      toast.success("Organizer deleted successfully");
     } catch (err) {
-      alert(err.message);
+      toast.error(err.message);
     }
+  };
+
+  const confirmDelete = (id) => {
+    confirmToast("Are you sure you want to delete this organizer?", () =>
+      handleDelete(id),
+    );
   };
 
   return (
@@ -134,7 +138,7 @@ const ManageOrganizers = () => {
 
         <button
           onClick={applyFilters}
-          className="h-10 text-white rounded-md bg-primary md:col-span-1"
+          className="h-10 text-white rounded-md bg-primary"
         >
           Apply Filters
         </button>
@@ -180,7 +184,7 @@ const ManageOrganizers = () => {
                   <td>{o.year}</td>
                   <td>
                     <button
-                      onClick={() => handleDelete(o._id)}
+                      onClick={() => confirmDelete(o._id)}
                       className="text-sm font-medium text-danger hover:underline"
                     >
                       Delete

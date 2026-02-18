@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import AdminLayout from "../../components/AdminLayout.jsx";
 import { apiRequest } from "../../services/api.js";
+import toast from "react-hot-toast";
+import { confirmToast } from "../../utils/confirmToast.jsx";
 
 const ManageMaterials = () => {
   const [allMaterials, setAllMaterials] = useState([]);
@@ -59,12 +61,6 @@ const ManageMaterials = () => {
   };
 
   const handleDelete = async (id) => {
-    const confirmDelete = window.confirm(
-      "Are you sure you want to delete this study material?",
-    );
-
-    if (!confirmDelete) return;
-
     try {
       await apiRequest(`/admin/materials/${id}`, {
         method: "DELETE",
@@ -72,9 +68,17 @@ const ManageMaterials = () => {
 
       setAllMaterials((prev) => prev.filter((m) => m._id !== id));
       setMaterials((prev) => prev.filter((m) => m._id !== id));
+
+      toast.success("Study material deleted successfully");
     } catch (err) {
-      alert(err.message);
+      toast.error(err.message);
     }
+  };
+
+  const confirmDelete = (id) => {
+    confirmToast("Are you sure you want to delete this study material?", () =>
+      handleDelete(id),
+    );
   };
 
   return (
@@ -137,7 +141,7 @@ const ManageMaterials = () => {
 
         <button
           onClick={applyFilters}
-          className="h-10 text-white rounded-md bg-primary md:col-span-1"
+          className="h-10 text-white rounded-md bg-primary"
         >
           Apply Filters
         </button>
@@ -183,7 +187,7 @@ const ManageMaterials = () => {
                   <td className="capitalize">{m.type}</td>
                   <td>
                     <button
-                      onClick={() => handleDelete(m._id)}
+                      onClick={() => confirmDelete(m._id)}
                       className="text-sm font-medium text-danger hover:underline"
                     >
                       Delete

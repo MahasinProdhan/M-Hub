@@ -2,6 +2,7 @@ import { useState } from "react";
 import AdminLayout from "../../components/AdminLayout.jsx";
 import { COURSES, SEMESTERS } from "../../utils/constants.js";
 import { apiRequest } from "../../services/api.js";
+import toast from "react-hot-toast";
 
 const AddPYQ = () => {
   const [formData, setFormData] = useState({
@@ -15,8 +16,6 @@ const AddPYQ = () => {
   });
 
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
 
   const selectedCourse = COURSES.find((c) => c.id === formData.course);
 
@@ -30,8 +29,6 @@ const AddPYQ = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError("");
-    setSuccess("");
 
     try {
       setLoading(true);
@@ -47,7 +44,7 @@ const AddPYQ = () => {
         }),
       });
 
-      setSuccess("PYQ added successfully ✅");
+      toast.success("PYQ added successfully");
 
       setFormData({
         title: "",
@@ -59,7 +56,7 @@ const AddPYQ = () => {
         driveLink: "",
       });
     } catch (err) {
-      setError(err.message);
+      toast.error(err.message);
     } finally {
       setLoading(false);
     }
@@ -74,19 +71,6 @@ const AddPYQ = () => {
           Add a previous year question paper
         </p>
       </div>
-
-      {/* Messages */}
-      {error && (
-        <div className="p-3 mb-4 text-sm rounded-md text-danger bg-red-50">
-          {error}
-        </div>
-      )}
-
-      {success && (
-        <div className="p-3 mb-4 text-sm rounded-md text-success bg-green-50">
-          {success}
-        </div>
-      )}
 
       {/* Form */}
       <form
