@@ -5,7 +5,7 @@ import AdminLayout from "../../components/AdminLayout.jsx";
 import { apiRequest } from "../../services/api.js";
 
 const Dashboard = () => {
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
 
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -25,6 +25,7 @@ const Dashboard = () => {
     fetchStats();
   }, []);
 
+  // 🔥 KEEPING ORIGINAL STATS STRUCTURE
   const allStats = [
     { title: "Total Users", count: stats?.totalUsers, link: "/users" },
     { title: "PYQs", count: stats?.pyqs },
@@ -33,49 +34,50 @@ const Dashboard = () => {
     { title: "Syllabus", count: stats?.syllabus },
   ];
 
-  const contentStats = [
+  const resources = [
     {
       title: "PYQs",
+      desc: "Previous year question papers",
       add: "/pyqs/add",
       manage: "/pyqs/manage",
-      desc: "Previous year question papers",
     },
     {
       title: "Study Materials",
+      desc: "Notes, references, guides",
       add: "/materials/add",
       manage: "/materials/manage",
-      desc: "Notes, references, guides",
     },
     {
       title: "Organizers",
+      desc: "Model question collections",
       add: "/organizers/add",
       manage: "/organizers/manage",
-      desc: "Model question collections",
     },
     {
       title: "Syllabus",
+      desc: "Semester-wise syllabus PDFs",
       add: "/syllabus/add",
       manage: "/syllabus/manage",
-      desc: "Semester-wise syllabus PDFs",
     },
   ];
 
   return (
     <AdminLayout>
       {/* Header */}
-      <div className="mb-10">
+      <div className="mb-6">
         <h1 className="text-2xl font-semibold text-textPrimary">
           Admin Dashboard
         </h1>
         <p className="mt-1 text-sm text-textSecondary">
-          Manage all academic content and monitor platform usage
+          Welcome back, {user?.name}
         </p>
       </div>
 
+      {/* 🔥 ORIGINAL STATS LAYOUT */}
       <div className="grid grid-cols-1 gap-4 mb-10 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
         {allStats.map((s) => {
           const Card = (
-            <div className="flex items-center justify-between p-5 transition card shadow-card hover:shadow-lg">
+            <div className="flex items-center justify-between p-5 transition bg-white border shadow-sm rounded-xl hover:shadow-lg border-borderLight">
               <p className="text-sm text-textSecondary">{s.title}</p>
               <p className="text-xl font-semibold text-primary">
                 {loading ? "—" : s.count}
@@ -94,52 +96,35 @@ const Dashboard = () => {
       </div>
 
       {/* Resource Management */}
-      <div className="grid grid-cols-1 gap-6 mb-12 md:grid-cols-2">
-        {contentStats.map((s) => (
-          <div key={s.title} className="p-6 card shadow-card">
-            <h2 className="text-lg font-semibold text-textPrimary">
-              {s.title}
+      <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
+        {resources.map((item) => (
+          <div
+            key={item.title}
+            className="p-8 transition-all duration-300 bg-white border shadow-sm rounded-2xl hover:shadow-lg border-borderLight"
+          >
+            <h2 className="text-xl font-semibold text-textPrimary">
+              {item.title}
             </h2>
 
-            <p className="mt-1 text-sm text-textSecondary">{s.desc}</p>
+            <p className="mt-2 text-sm text-textSecondary">{item.desc}</p>
 
-            <div className="flex gap-4 mt-5">
+            <div className="flex gap-4 mt-6">
               <Link
-                to={s.add}
-                className="px-4 py-2 text-sm font-medium text-white rounded-md bg-primary"
+                to={item.add}
+                className="px-5 py-2.5 text-sm font-semibold text-white rounded-lg bg-primary transition-all duration-300 hover:shadow-md hover:opacity-90"
               >
                 + Add
               </Link>
 
               <Link
-                to={s.manage}
-                className="px-4 py-2 text-sm font-medium border rounded-md border-borderLight"
+                to={item.manage}
+                className="px-5 py-2.5 text-sm font-semibold border rounded-lg border-borderLight transition-all duration-300 hover:border-primary hover:bg-gray-50"
               >
                 Manage
               </Link>
             </div>
           </div>
         ))}
-      </div>
-
-      {/* Admin Info */}
-      <div className="flex flex-wrap items-center justify-between gap-4 p-5 card shadow-card">
-        <div>
-          <p className="text-sm text-textSecondary">Logged in as</p>
-          <p className="text-base font-medium text-textPrimary">{user?.name}</p>
-          <p className="text-sm text-textMuted">{user?.email}</p>
-
-          <span className="inline-block px-3 py-1 mt-2 text-xs font-medium rounded-full bg-blue-50 text-primary">
-            Role: {user?.role}
-          </span>
-        </div>
-
-        <button
-          onClick={logout}
-          className="px-6 py-2 text-sm font-medium text-white rounded-md bg-danger"
-        >
-          Logout
-        </button>
       </div>
     </AdminLayout>
   );

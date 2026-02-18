@@ -22,6 +22,25 @@ const userSchema = new mongoose.Schema(
       minlength: 6,
     },
 
+    college: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+
+    course: {
+      type: String,
+      required: true,
+      lowercase: true,
+      enum: ["btech", "bca", "bsc", "ba"],
+    },
+
+    branch: {
+      type: String,
+      default: null, // only for BTech
+      trim: true,
+    },
+
     role: {
       type: String,
       enum: ["user", "admin"],
