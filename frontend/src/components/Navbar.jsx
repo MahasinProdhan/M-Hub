@@ -6,7 +6,7 @@ import { useAuth } from "../context/AuthContext.jsx";
 
 const Navbar = () => {
   const navigate = useNavigate();
-  const { isLoggedIn, user, logout } = useAuth();
+  const { isLoggedIn, user, logout, loading: authLoading } = useAuth();
   const [avatarLoadError, setAvatarLoadError] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuRef = useRef(null);
@@ -99,7 +99,12 @@ const Navbar = () => {
         </div>
 
         <div className="flex items-center gap-4">
-          {isLoggedIn ? (
+          {authLoading ? (
+            <div className="flex items-center gap-2 animate-pulse">
+              <div className="w-9 h-9 rounded-full bg-gray-200" />
+              <div className="hidden w-20 h-4 rounded bg-gray-200 md:block" />
+            </div>
+          ) : isLoggedIn ? (
             <div className="relative" ref={menuRef}>
               <button
                 type="button"

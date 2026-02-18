@@ -3,9 +3,11 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import Sidebar from "../components/Sidebar";
 import StudyMaterialCard from "../components/StudyMaterialCard";
+import ListSkeleton from "../components/skeletons/ListSkeleton.jsx";
 import { useFilters } from "../context/FilterContext";
 import { useAuth } from "../context/AuthContext.jsx";
 import { useSavedResources } from "../context/SavedResourcesContext.jsx";
+import { apiRequest } from "../services/api.js";
 
 const StudyMaterials = () => {
   const { filters } = useFilters();
@@ -30,11 +32,7 @@ const StudyMaterials = () => {
         if (filters.subject !== "all") params.append("subject", filters.subject);
         if (filters.search) params.append("search", filters.search);
 
-        const response = await fetch(
-          `http://localhost:5000/api/materials?${params.toString()}`,
-        );
-
-        const result = await response.json();
+        const result = await apiRequest(`/materials?${params.toString()}`);
 
         setMaterials(result.data);
         setError(null);
@@ -76,10 +74,11 @@ const StudyMaterials = () => {
           </p>
         </div>
 
-        {loading && <p>Loading study materials...</p>}
-        {error && <p className="text-red-500">{error}</p>}
-
-        {!loading && !error && materials.length > 0 ? (
+        {loading ? (
+          <ListSkeleton count={6} />
+        ) : error ? (
+          <p className="text-red-500">{error}</p>
+        ) : materials.length > 0 ? (
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {materials.map((material) => (
               <StudyMaterialCard
@@ -92,12 +91,9 @@ const StudyMaterials = () => {
             ))}
           </div>
         ) : (
-          !loading &&
-          !error && (
-            <div className="p-6 text-center card text-textSecondary">
-              No study materials found for selected filters.
-            </div>
-          )
+          <div className="p-6 text-center card text-textSecondary">
+            No study materials found for selected filters.
+          </div>
         )}
       </main>
     </div>

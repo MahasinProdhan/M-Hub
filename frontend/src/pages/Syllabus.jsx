@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import Sidebar from "../components/Sidebar";
 import SyllabusCard from "../components/SyllabusCard";
 import { useFilters } from "../context/FilterContext";
+import { apiRequest } from "../services/api.js";
 
 const Syllabus = () => {
   const { filters } = useFilters();
@@ -22,11 +23,7 @@ const Syllabus = () => {
           params.append("semester", filters.semester);
         if (filters.branch !== "all") params.append("branch", filters.branch);
 
-        const response = await fetch(
-          `http://localhost:5000/api/syllabus?${params.toString()}`,
-        );
-
-        const result = await response.json();
+        const result = await apiRequest(`/syllabus?${params.toString()}`);
 
         setSyllabus(result.data);
         setError(null);
