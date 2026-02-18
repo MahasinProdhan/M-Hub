@@ -10,6 +10,7 @@ import ManagePYQs from "./pages/pyqs/ManagePYQs";
 import ManageMaterials from "./pages/materials/ManageMaterials";
 import ManageOrganizers from "./pages/organizers/ManageOrganizers";
 import ManageSyllabus from "./pages/syllabus/ManageSyllabus";
+import ManageUsers from "./pages/users/ManageUsers.jsx";
 
 const App = () => {
   return (
@@ -89,6 +90,7 @@ const App = () => {
           </ProtectedAdmin>
         }
       />
+      <Route path="/users" element={<ManageUsers />} />
       <Route path="*" element={<Navigate to="/dashboard" replace />} />
     </Routes>
   );
