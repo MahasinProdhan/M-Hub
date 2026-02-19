@@ -7,11 +7,14 @@ import { useAuth } from "../context/AuthContext.jsx";
 const Navbar = () => {
   const navigate = useNavigate();
   const { isLoggedIn, user, logout, loading: authLoading } = useAuth();
+
   const [avatarLoadError, setAvatarLoadError] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+
   const menuRef = useRef(null);
   const firstMenuItemRef = useRef(null);
 
+  // Avatar URL handling (unchanged logic)
   const rawBase = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
   const baseUrl = rawBase.replace(/\/$/, "").replace(/\/api$/, "");
   const avatarPath = user?.avatar
@@ -28,66 +31,59 @@ const Navbar = () => {
   useEffect(() => {
     if (!isMenuOpen) return;
 
-    const handleOutsideClick = (event) => {
-      if (menuRef.current && !menuRef.current.contains(event.target)) {
+    const handleOutside = (e) => {
+      if (menuRef.current && !menuRef.current.contains(e.target)) {
         setIsMenuOpen(false);
       }
     };
 
-    const handleEscape = (event) => {
-      if (event.key === "Escape") {
-        setIsMenuOpen(false);
-      }
+    const handleEscape = (e) => {
+      if (e.key === "Escape") setIsMenuOpen(false);
     };
 
-    document.addEventListener("mousedown", handleOutsideClick);
-    document.addEventListener("touchstart", handleOutsideClick);
+    document.addEventListener("mousedown", handleOutside);
     document.addEventListener("keydown", handleEscape);
 
     return () => {
-      document.removeEventListener("mousedown", handleOutsideClick);
-      document.removeEventListener("touchstart", handleOutsideClick);
+      document.removeEventListener("mousedown", handleOutside);
       document.removeEventListener("keydown", handleEscape);
     };
   }, [isMenuOpen]);
 
   useEffect(() => {
-    if (isMenuOpen) {
-      firstMenuItemRef.current?.focus();
-    }
+    if (isMenuOpen) firstMenuItemRef.current?.focus();
   }, [isMenuOpen]);
 
-  const handleAvatarKeyDown = (event) => {
-    if (
-      event.key === "Enter" ||
-      event.key === " " ||
-      event.key === "ArrowDown"
-    ) {
-      event.preventDefault();
-      setIsMenuOpen(true);
-    }
-  };
-
   return (
-    <nav className="border-b border-slate-200 bg-white/95 backdrop-blur">
-      <div className="container-page h-[68px] flex items-center justify-between">
-        <Link to="/" className="flex items-center gap-2">
-          <img src={logo} alt="M Hub Logo" className="object-contain h-12" />
+    <nav className="sticky top-0 z-40 border-b border-slate-200 bg-white/95 backdrop-blur">
+      <div className="container-page flex h-[68px] items-center justify-between">
+        {/* Left: Logo */}
+        <Link to="/" className="flex items-center gap-3">
+          <img src={logo} alt="M Hub Logo" className="object-contain h-14" />
+          <div className="flex-col hidden leading-tight md:flex">
+            <span className="text-sm font-semibold text-slate-900">M Hub</span>
+            <span className="text-xs text-slate-500">
+              MAKAUT Academic Portal
+            </span>
+          </div>
         </Link>
 
-        <div className="items-center hidden gap-10 md:flex">
+        {/* Middle: Global Navigation */}
+        <div className="items-center hidden gap-8 ml-12 md:flex">
           {[
             { to: "/", label: "Home" },
-            { to: "/pyqs", label: "PYQs" },
-            { to: "/materials", label: "Study Materials" },
-            { to: "/organizers", label: "Organizers" },
+            { to: "/about", label: "About" },
+            { to: "/faq", label: "FAQ" },
+            { to: "/help", label: "Help" },
           ].map((item) => (
             <NavLink
               key={item.to}
               to={item.to}
               className={({ isActive }) =>
                 `text-sm font-medium transition ${
-                  isActive ? "text-blue-600" : "text-slate-600 hover:text-slate-900"
+                  isActive
+                    ? "text-blue-600"
+                    : "text-slate-600 hover:text-slate-900"
                 }`
               }
             >
@@ -96,52 +92,43 @@ const Navbar = () => {
           ))}
         </div>
 
+        {/* Right: Auth / Profile */}
         <div className="flex items-center gap-4">
           {authLoading ? (
             <div className="flex items-center gap-2 animate-pulse">
-              <div className="w-9 h-9 rounded-full bg-gray-200" />
-              <div className="hidden w-20 h-4 rounded bg-gray-200 md:block" />
+              <div className="rounded-full h-9 w-9 bg-slate-200" />
+              <div className="hidden w-20 h-4 rounded bg-slate-200 md:block" />
             </div>
           ) : isLoggedIn ? (
             <div className="relative" ref={menuRef}>
               <button
-                type="button"
-                onClick={() => setIsMenuOpen((prev) => !prev)}
-                onKeyDown={handleAvatarKeyDown}
+                onClick={() => setIsMenuOpen((p) => !p)}
+                className="flex items-center gap-2 px-1 py-1 rounded-md hover:bg-slate-50"
                 aria-haspopup="menu"
                 aria-expanded={isMenuOpen}
-                aria-controls="navbar-user-menu"
-                className="flex items-center gap-2"
               >
                 {avatarUrl && !avatarLoadError ? (
                   <img
                     src={avatarUrl}
                     alt="Profile"
                     onError={() => setAvatarLoadError(true)}
-                    className="object-cover border rounded-full w-9 h-9"
+                    className="object-cover border rounded-full h-9 w-9"
                   />
                 ) : (
-                  <div className="flex items-center justify-center w-9 h-9 border rounded-full border-slate-200 bg-slate-100">
+                  <div className="flex items-center justify-center border rounded-full h-9 w-9 bg-slate-100">
                     <User className="w-5 h-5 text-slate-500" />
                   </div>
                 )}
 
-                <span className="hidden text-sm font-medium text-slate-900 md:block">
+                <span className="hidden text-sm font-medium md:block text-slate-900">
                   {user?.name}
                 </span>
               </button>
 
               {isMenuOpen && (
-                <div
-                  id="navbar-user-menu"
-                  role="menu"
-                  aria-label="User menu"
-                  className="absolute right-0 z-50 w-44 py-1 mt-2 bg-white border rounded-md shadow-lg border-slate-200"
-                >
+                <div className="absolute right-0 py-1 mt-2 bg-white border rounded-md shadow-lg w-44">
                   <button
                     ref={firstMenuItemRef}
-                    type="button"
-                    role="menuitem"
                     onClick={() => {
                       setIsMenuOpen(false);
                       navigate("/profile");
@@ -152,8 +139,6 @@ const Navbar = () => {
                   </button>
 
                   <button
-                    type="button"
-                    role="menuitem"
                     onClick={() => {
                       setIsMenuOpen(false);
                       logout();
@@ -176,7 +161,7 @@ const Navbar = () => {
 
               <NavLink
                 to="/register"
-                className="px-4 py-2 text-sm font-medium text-white rounded-md bg-blue-600 hover:bg-blue-700"
+                className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700"
               >
                 Register
               </NavLink>
