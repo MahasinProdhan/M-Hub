@@ -1,6 +1,7 @@
 import express from "express";
 import { protect } from "../../middlewares/auth.middleware.js";
 import { adminOnly } from "../../middlewares/admin.middleware.js";
+import { uploadPdfSingle } from "../../middlewares/pdfUpload.middleware.js";
 import {
   createSyllabus,
   deleteSyllabus,
@@ -8,7 +9,13 @@ import {
 
 const router = express.Router();
 
-router.post("/syllabus", protect, adminOnly, createSyllabus);
+router.post(
+  "/syllabus",
+  protect,
+  adminOnly,
+  uploadPdfSingle("pdfFile"),
+  createSyllabus,
+);
 router.delete("/syllabus/:id", protect, adminOnly, deleteSyllabus);
 
 export default router;

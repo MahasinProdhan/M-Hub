@@ -14,6 +14,8 @@ import adminOrganizerRoutes from "./routes/admin/organizer.admin.routes.js";
 import adminSyllabusRoutes from "./routes/admin/syllabus.admin.routes.js";
 import adminStatsRoutes from "./routes/admin/stats.admin.routes.js";
 import adminUserRoutes from "./routes/admin/user.admin.routes.js";
+import { notFound } from "./middlewares/notFound.middleware.js";
+import { errorHandler } from "./middlewares/error.middleware.js";
 import {
   decodeAvatarProxyPath,
   isCloudinaryAvatarUrl,
@@ -57,5 +59,8 @@ app.use("/api/admin", adminUserRoutes);
 app.get("/", (req, res) => {
   res.send("M Hub Backend API is running");
 });
+
+app.use(notFound);
+app.use(errorHandler);
 
 export default app;

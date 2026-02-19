@@ -1,4 +1,8 @@
 import PYQ from "../../models/pyq.model.js";
+import {
+  deletePdfFromCloudinary,
+  resolveResourceLinks,
+} from "../../utils/pdfUpload.utils.js";
 
 // CREATE PYQ
 export const createPYQ = async (req, res, next) => {
@@ -21,11 +25,21 @@ export const createPYQ = async (req, res, next) => {
       !course ||
       !semester ||
       !year ||
-      !fileType ||
-      !driveLink
+      !fileType
     ) {
       return res.status(400).json({
         message: "Missing required fields",
+      });
+    }
+
+    const resourceLinks = await resolveResourceLinks({
+      file: req.file,
+      driveLink,
+    });
+
+    if (!resourceLinks.ok) {
+      return res.status(resourceLinks.status).json({
+        message: resourceLinks.message,
       });
     }
 
@@ -37,11 +51,15 @@ export const createPYQ = async (req, res, next) => {
       semester,
       year,
       fileType,
-      driveLink,
+      fileUrl: resourceLinks.fileUrl,
+      filePublicId: resourceLinks.filePublicId,
+      driveLink: resourceLinks.driveLink,
     });
 
     res.status(201).json({
-      message: "PYQ created successfully",
+      message: resourceLinks.fallbackUsed
+        ? "PYQ created successfully using Drive fallback"
+        : "PYQ created successfully",
       pyq,
     });
   } catch (error) {
@@ -58,6 +76,15 @@ export const deletePYQ = async (req, res, next) => {
       return res.status(404).json({
         message: "PYQ not found",
       });
+    }
+
+    try {
+      await deletePdfFromCloudinary(pyq);
+    } catch (cloudinaryError) {
+      console.error(
+        "Failed to delete Cloudinary PDF for PYQ:",
+        cloudinaryError.message,
+      );
     }
 
     await pyq.deleteOne();
