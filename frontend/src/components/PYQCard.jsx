@@ -2,6 +2,12 @@ import { FileText } from "lucide-react";
 import SaveResourceButton from "./SaveResourceButton.jsx";
 
 const PYQCard = ({ pyq, isSaved = false, isSaving = false, onToggleSave }) => {
+  const handleOpen = () => {
+    const url = pyq.fileUrl || pyq.driveLink;
+    if (!url) return;
+    window.open(url, "_blank", "noopener,noreferrer");
+  };
+
   return (
     <div className="flex flex-col justify-between p-5 transition duration-200 border rounded-2xl border-slate-200 bg-white hover:border-blue-200 hover:shadow-md">
       <div className="flex items-start justify-between gap-3">
@@ -45,14 +51,14 @@ const PYQCard = ({ pyq, isSaved = false, isSaving = false, onToggleSave }) => {
           {pyq.fileType}
         </span>
 
-        <a
-          href={pyq.driveLink}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-sm font-medium text-blue-600 hover:underline"
+        <button
+          type="button"
+          onClick={handleOpen}
+          disabled={!pyq.fileUrl && !pyq.driveLink}
+          className="text-sm font-medium text-blue-600 hover:underline disabled:cursor-not-allowed disabled:text-slate-400 disabled:no-underline"
         >
           View
-        </a>
+        </button>
       </div>
     </div>
   );

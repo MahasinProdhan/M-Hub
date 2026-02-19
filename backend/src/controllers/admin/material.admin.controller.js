@@ -1,4 +1,8 @@
 import Material from "../../models/material.model.js";
+import {
+  deletePdfFromCloudinary,
+  resolveResourceLinks,
+} from "../../utils/pdfUpload.utils.js";
 
 // CREATE STUDY MATERIAL
 export const createMaterial = async (req, res, next) => {
@@ -20,11 +24,21 @@ export const createMaterial = async (req, res, next) => {
       !course ||
       !semester ||
       !type ||
-      !fileType ||
-      !driveLink
+      !fileType
     ) {
       return res.status(400).json({
         message: "Missing required fields",
+      });
+    }
+
+    const resourceLinks = await resolveResourceLinks({
+      file: req.file,
+      driveLink,
+    });
+
+    if (!resourceLinks.ok) {
+      return res.status(resourceLinks.status).json({
+        message: resourceLinks.message,
       });
     }
 
@@ -36,11 +50,15 @@ export const createMaterial = async (req, res, next) => {
       semester,
       type,
       fileType,
-      driveLink,
+      fileUrl: resourceLinks.fileUrl,
+      filePublicId: resourceLinks.filePublicId,
+      driveLink: resourceLinks.driveLink,
     });
 
     res.status(201).json({
-      message: "Study material created successfully",
+      message: resourceLinks.fallbackUsed
+        ? "Study material created successfully using Drive fallback"
+        : "Study material created successfully",
       material,
     });
   } catch (error) {
@@ -57,6 +75,15 @@ export const deleteMaterial = async (req, res, next) => {
       return res.status(404).json({
         message: "Study material not found",
       });
+    }
+
+    try {
+      await deletePdfFromCloudinary(material);
+    } catch (cloudinaryError) {
+      console.error(
+        "Failed to delete Cloudinary PDF for study material:",
+        cloudinaryError.message,
+      );
     }
 
     await material.deleteOne();

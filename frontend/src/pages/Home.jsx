@@ -4,6 +4,7 @@ import Sidebar from "../components/Sidebar";
 import ActionCard from "../components/ActionCard";
 import { apiRequest } from "../services/api.js";
 import DashboardSkeleton from "../components/skeletons/DashboardSkeleton.jsx";
+import { useAuth } from "../context/AuthContext.jsx";
 
 const TYPE_CONFIG = {
   pyq: {
@@ -20,7 +21,11 @@ const TYPE_CONFIG = {
   },
 };
 
-const normalizeRecentItems = ({ pyqs = [], materials = [], organizers = [] }) => {
+const normalizeRecentItems = ({
+  pyqs = [],
+  materials = [],
+  organizers = [],
+}) => {
   const pyqItems = pyqs.map((item) => ({
     id: `pyq:${item._id}`,
     type: "pyq",
@@ -28,7 +33,7 @@ const normalizeRecentItems = ({ pyqs = [], materials = [], organizers = [] }) =>
     meta: `Semester ${item.semester} - ${item.course?.toUpperCase() || ""}${
       item.branch ? ` - ${item.branch}` : ""
     }`,
-    href: item.driveLink,
+    href: item.fileUrl || item.driveLink,
     createdAt: item.createdAt || "",
   }));
 
@@ -39,7 +44,7 @@ const normalizeRecentItems = ({ pyqs = [], materials = [], organizers = [] }) =>
     meta: `Semester ${item.semester} - ${item.course?.toUpperCase() || ""}${
       item.branch ? ` - ${item.branch}` : ""
     }`,
-    href: item.driveLink,
+    href: item.fileUrl || item.driveLink,
     createdAt: item.createdAt || "",
   }));
 
@@ -50,20 +55,22 @@ const normalizeRecentItems = ({ pyqs = [], materials = [], organizers = [] }) =>
     meta: `Semester ${item.semester} - ${item.course?.toUpperCase() || ""}${
       item.branch ? ` - ${item.branch}` : ""
     }`,
-    href: item.driveLink,
+    href: item.fileUrl || item.driveLink,
     createdAt: item.createdAt || "",
   }));
 
   return [...pyqItems, ...materialItems, ...organizerItems]
     .filter((item) => item.href)
-    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+    .sort(
+      (a, b) =>
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+    )
     .slice(0, 4);
 };
 
 const Home = () => {
   // TEMPORARY: frontend-only
-  const isLoggedIn = true;
-  const userName = "Student";
+  const { user, isLoggedIn, loading: authLoading } = useAuth();
 
   const [recentItems, setRecentItems] = useState([]);
   const [recentLoading, setRecentLoading] = useState(true);
@@ -119,8 +126,8 @@ const Home = () => {
               Welcome to M Hub
             </h1>
             <p className="mt-4 text-slate-600">
-              A centralized platform to access PYQs, study materials, organizers,
-              and syllabus under MAKAUT.
+              A centralized platform to access PYQs, study materials,
+              organizers, and syllabus under MAKAUT.
             </p>
 
             <div className="flex justify-center gap-4 mt-8">
@@ -149,10 +156,11 @@ const Home = () => {
             <DashboardSkeleton />
           ) : (
             <main className="flex-1 p-8 transition-opacity duration-300 opacity-100">
-              <div className="p-6 border shadow-sm rounded-2xl bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-100">
+              <div className="p-6 border border-blue-100 shadow-sm rounded-2xl bg-gradient-to-r from-blue-50 to-indigo-50">
                 <h2 className="text-2xl font-semibold text-slate-900">
-                  Welcome back, {userName}
+                  Welcome back, {user?.name || "Student"} 👋
                 </h2>
+
                 <p className="max-w-xl mt-2 text-sm text-slate-600">
                   Quickly access academic resources like PYQs, study materials,
                   organizers, and syllabus for your semester.
@@ -187,8 +195,12 @@ const Home = () => {
 
               <section className="mt-14">
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg font-semibold text-slate-900">Recently Added</h3>
-                  <span className="text-xs text-slate-500">Updated automatically</span>
+                  <h3 className="text-lg font-semibold text-slate-900">
+                    Recently Added
+                  </h3>
+                  <span className="text-xs text-slate-500">
+                    Updated automatically
+                  </span>
                 </div>
 
                 {recentError && (
@@ -198,7 +210,7 @@ const Home = () => {
                 )}
 
                 {!recentError && recentItems.length === 0 && (
-                  <div className="p-4 text-sm border rounded-xl border-slate-200 bg-white text-slate-600">
+                  <div className="p-4 text-sm bg-white border rounded-xl border-slate-200 text-slate-600">
                     No recent resources available right now.
                   </div>
                 )}
@@ -211,7 +223,7 @@ const Home = () => {
                         href={item.href}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="group flex items-start justify-between gap-3 rounded-xl border border-slate-200 bg-white p-4 transition-all hover:border-blue-200 hover:shadow-md"
+                        className="flex items-start justify-between gap-3 p-4 transition-all bg-white border group rounded-xl border-slate-200 hover:border-blue-200 hover:shadow-md"
                       >
                         <div className="min-w-0">
                           <span

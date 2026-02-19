@@ -16,9 +16,10 @@ const RESOURCE_MODEL_MAP = {
 };
 
 const RESOURCE_SELECT_FIELDS = {
-  pyq: "subject year course branch semester fileType driveLink",
-  material: "title subject course branch semester type fileType driveLink",
-  organizer: "title subject course branch semester year fileType driveLink",
+  pyq: "subject year course branch semester fileType fileUrl driveLink",
+  material:
+    "title subject course branch semester type fileType fileUrl driveLink",
+  organizer: "title subject course branch semester year fileType fileUrl driveLink",
 };
 
 const getUserIdFromRequest = (req) => req.user?._id || req.user?.id || req.user?.userId;

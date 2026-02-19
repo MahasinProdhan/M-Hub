@@ -12,6 +12,7 @@ const AddPYQ = () => {
     branch: "",
     semester: "",
     year: "",
+    pdfFile: null,
     driveLink: "",
   });
 
@@ -27,21 +28,51 @@ const AddPYQ = () => {
     }));
   };
 
+  const handlePdfChange = (e) => {
+    const file = e.target.files?.[0] || null;
+    setFormData((prev) => ({
+      ...prev,
+      pdfFile: file,
+    }));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    const hasDriveLink = formData.driveLink.trim().length > 0;
+    const hasPdfFile = Boolean(formData.pdfFile);
+
+    if (!hasDriveLink && !hasPdfFile) {
+      toast.error("Upload a PDF OR paste a Google Drive link");
+      return;
+    }
 
     try {
       setLoading(true);
 
+      const payload = new FormData();
+      payload.append("title", formData.title);
+      payload.append("subject", formData.subject);
+      payload.append("course", formData.course);
+      payload.append("semester", String(Number(formData.semester)));
+      payload.append("year", String(Number(formData.year)));
+      payload.append("fileType", "PDF");
+
+      if (selectedCourse?.hasBranches) {
+        payload.append("branch", formData.branch);
+      }
+
+      if (hasDriveLink) {
+        payload.append("driveLink", formData.driveLink.trim());
+      }
+
+      if (hasPdfFile) {
+        payload.append("pdfFile", formData.pdfFile);
+      }
+
       await apiRequest("/admin/pyqs", {
         method: "POST",
-        body: JSON.stringify({
-          ...formData,
-          semester: Number(formData.semester),
-          year: Number(formData.year),
-          fileType: "PDF",
-          branch: selectedCourse?.hasBranches ? formData.branch : null,
-        }),
+        body: payload,
       });
 
       toast.success("PYQ added successfully");
@@ -53,6 +84,7 @@ const AddPYQ = () => {
         branch: "",
         semester: "",
         year: "",
+        pdfFile: null,
         driveLink: "",
       });
     } catch (err) {
@@ -178,6 +210,23 @@ const AddPYQ = () => {
           />
         </div>
 
+        <div>
+          <p className="text-xs text-textSecondary">
+            Upload a PDF OR paste a Google Drive link
+          </p>
+        </div>
+
+        <div>
+          <label className="block mb-1 text-sm font-medium">PDF File</label>
+          <input
+            type="file"
+            name="pdfFile"
+            accept="application/pdf"
+            onChange={handlePdfChange}
+            className="w-full px-4 py-2 border rounded-md border-borderLight"
+          />
+        </div>
+
         {/* Drive Link */}
         <div>
           <label className="block mb-1 text-sm font-medium">
@@ -186,7 +235,6 @@ const AddPYQ = () => {
           <input
             type="url"
             name="driveLink"
-            required
             value={formData.driveLink}
             onChange={handleChange}
             placeholder="https://drive.google.com/..."

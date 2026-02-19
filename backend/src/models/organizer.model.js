@@ -33,13 +33,35 @@ const organizerSchema = new mongoose.Schema(
       type: String,
       default: "PDF",
     },
+    fileUrl: {
+      type: String,
+      default: null,
+    },
+    filePublicId: {
+      type: String,
+      default: null,
+    },
     driveLink: {
       type: String,
-      required: true,
+      default: null,
     },
   },
   { timestamps: true },
 );
+
+organizerSchema.pre("validate", function ensureResourceLink(next) {
+  const hasFileUrl =
+    typeof this.fileUrl === "string" && this.fileUrl.trim().length > 0;
+  const hasDriveLink =
+    typeof this.driveLink === "string" && this.driveLink.trim().length > 0;
+
+  if (!hasFileUrl && !hasDriveLink) {
+    this.invalidate("fileUrl", "Either fileUrl or driveLink is required");
+    this.invalidate("driveLink", "Either fileUrl or driveLink is required");
+  }
+
+  next();
+});
 
 const Organizer = mongoose.model("Organizer", organizerSchema);
 

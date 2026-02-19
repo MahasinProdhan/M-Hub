@@ -142,14 +142,18 @@ const SavedMaterials = () => {
                     </div>
 
                     <div className="flex items-center gap-3">
-                      <a
-                        href={resource.driveLink}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-sm font-medium text-primary hover:underline"
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const url = resource.fileUrl || resource.driveLink;
+                          if (!url) return;
+                          window.open(url, "_blank", "noopener,noreferrer");
+                        }}
+                        disabled={!resource.fileUrl && !resource.driveLink}
+                        className="text-sm font-medium text-primary hover:underline disabled:cursor-not-allowed disabled:text-slate-400 disabled:no-underline"
                       >
                         Open
-                      </a>
+                      </button>
 
                       <button
                         type="button"
