@@ -1,9 +1,10 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Bookmark, RotateCcw } from "lucide-react";
+import { Bookmark, RotateCcw, User } from "lucide-react";
 import { COURSES, SEMESTERS, SUBJECTS } from "../utils/constants";
 import { useFilters } from "../context/FilterContext";
 import { useSavedResources } from "../context/SavedResourcesContext.jsx";
+import { useAuth } from "../context/AuthContext.jsx";
 
 const BRANCH_TO_SUBJECT_KEY = {
   "Computer Science Engineering": "cse",
@@ -13,17 +14,33 @@ const BRANCH_TO_SUBJECT_KEY = {
 const Sidebar = () => {
   const { setFilters } = useFilters();
   const { savedItems } = useSavedResources();
+  const { user } = useAuth();
   const location = useLocation();
 
   const isSyllabusPage = location.pathname === "/syllabus";
   const isSavedMaterialsPage = location.pathname.startsWith("/saved");
+  const isProfilePage = location.pathname.startsWith("/profile");
   const savedCount = savedItems.length;
+  const [avatarLoadError, setAvatarLoadError] = useState(false);
+
+  const rawBase = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
+  const baseUrl = rawBase.replace(/\/$/, "").replace(/\/api$/, "");
+  const avatarPath = user?.avatar
+    ? user.avatar.startsWith("/")
+      ? user.avatar
+      : `/${user.avatar}`
+    : "";
+  const avatarUrl = avatarPath ? `${baseUrl}${avatarPath}` : "";
 
   const [selectedCourseId, setSelectedCourseId] = useState("all");
   const [selectedSemester, setSelectedSemester] = useState("all");
   const [selectedBranch, setSelectedBranch] = useState("all");
   const [selectedSubject, setSelectedSubject] = useState("all");
   const [searchText, setSearchText] = useState("");
+
+  useEffect(() => {
+    setAvatarLoadError(false);
+  }, [user?.avatar]);
 
   const selectedCourse = useMemo(() => {
     if (selectedCourseId === "all") return null;
@@ -249,8 +266,38 @@ const Sidebar = () => {
             </Link>
           </li>
           <li>
-            <Link to="/profile" className="transition-colors hover:text-blue-600">
-              My Profile
+            <Link
+              to="/profile"
+              className={`group flex cursor-pointer items-center justify-between rounded-md px-2 py-1.5 transition-colors ${
+                isProfilePage
+                  ? "bg-blue-50 text-blue-700"
+                  : "text-slate-700 hover:bg-slate-100 hover:text-blue-600"
+              }`}
+            >
+              <span className="flex items-center gap-2">
+                {avatarUrl && !avatarLoadError ? (
+                  <img
+                    src={avatarUrl}
+                    alt="Profile"
+                    onError={() => setAvatarLoadError(true)}
+                    className={`h-5 w-5 rounded-full border object-cover transition-colors ${
+                      isProfilePage
+                        ? "border-blue-200"
+                        : "border-slate-200 group-hover:border-blue-200"
+                    }`}
+                  />
+                ) : (
+                  <User
+                    size={15}
+                    className={`${
+                      isProfilePage
+                        ? "text-blue-500"
+                        : "text-blue-400 group-hover:text-blue-500"
+                    } transition-colors`}
+                  />
+                )}
+                <span>My Profile</span>
+              </span>
             </Link>
           </li>
         </ul>
