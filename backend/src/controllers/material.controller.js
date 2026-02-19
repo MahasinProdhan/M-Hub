@@ -3,6 +3,7 @@ import StudyMaterial from "../models/material.model.js";
 export const getAllMaterials = async (req, res, next) => {
   try {
     const { course, semester, branch, subject, type, search } = req.query;
+    const normalizedSearch = typeof search === "string" ? search.trim() : "";
 
     const filters = {};
 
@@ -12,10 +13,10 @@ export const getAllMaterials = async (req, res, next) => {
     if (subject && subject !== "all") filters.subject = subject;
     if (type && type !== "all") filters.type = type;
 
-    if (search) {
+    if (normalizedSearch) {
       filters.$or = [
-        { title: { $regex: search, $options: "i" } },
-        { subject: { $regex: search, $options: "i" } },
+        { title: { $regex: normalizedSearch, $options: "i" } },
+        { subject: { $regex: normalizedSearch, $options: "i" } },
       ];
     }
 

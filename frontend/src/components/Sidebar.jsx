@@ -12,7 +12,7 @@ const BRANCH_TO_SUBJECT_KEY = {
 };
 
 const Sidebar = () => {
-  const { setFilters } = useFilters();
+  const { filters, setFilters } = useFilters();
   const { savedItems } = useSavedResources();
   const { user } = useAuth();
   const location = useLocation();
@@ -32,15 +32,23 @@ const Sidebar = () => {
     : "";
   const avatarUrl = avatarPath ? `${baseUrl}${avatarPath}` : "";
 
-  const [selectedCourseId, setSelectedCourseId] = useState("all");
-  const [selectedSemester, setSelectedSemester] = useState("all");
-  const [selectedBranch, setSelectedBranch] = useState("all");
-  const [selectedSubject, setSelectedSubject] = useState("all");
-  const [searchText, setSearchText] = useState("");
+  const [selectedCourseId, setSelectedCourseId] = useState(filters.course || "all");
+  const [selectedSemester, setSelectedSemester] = useState(filters.semester || "all");
+  const [selectedBranch, setSelectedBranch] = useState(filters.branch || "all");
+  const [selectedSubject, setSelectedSubject] = useState(filters.subject || "all");
+  const [searchText, setSearchText] = useState(filters.search || "");
 
   useEffect(() => {
     setAvatarLoadError(false);
   }, [user?.avatar]);
+
+  useEffect(() => {
+    setSelectedCourseId(filters.course || "all");
+    setSelectedSemester(filters.semester || "all");
+    setSelectedBranch(filters.branch || "all");
+    setSelectedSubject(filters.subject || "all");
+    setSearchText(filters.search || "");
+  }, [filters]);
 
   const selectedCourse = useMemo(() => {
     if (selectedCourseId === "all") return null;
@@ -75,12 +83,14 @@ const Sidebar = () => {
   };
 
   const applyFilters = () => {
+    const normalizedSearch = isSyllabusPage ? "" : searchText.trim();
+
     setFilters({
       course: selectedCourseId,
       semester: selectedSemester,
       branch: selectedBranch,
       subject: isSyllabusPage ? "all" : selectedSubject,
-      search: isSyllabusPage ? "" : searchText,
+      search: normalizedSearch,
     });
   };
 
@@ -120,7 +130,7 @@ const Sidebar = () => {
           </label>
           <input
             type="text"
-            placeholder="Search subject or title..."
+            placeholder="Search resources..."
             value={searchText}
             onChange={(event) => setSearchText(event.target.value)}
             className="h-10 w-full rounded-md border border-slate-200 px-3 text-sm text-slate-700 placeholder:text-slate-400 focus:border-blue-300"
