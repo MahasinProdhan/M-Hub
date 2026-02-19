@@ -30,7 +30,9 @@ const Organizers = () => {
         if (filters.semester !== "all") params.append("semester", filters.semester);
         if (filters.branch !== "all") params.append("branch", filters.branch);
         if (filters.subject !== "all") params.append("subject", filters.subject);
-        if (filters.search) params.append("search", filters.search);
+        const normalizedSearch =
+          typeof filters.search === "string" ? filters.search.trim() : "";
+        if (normalizedSearch) params.append("search", normalizedSearch);
 
         const result = await apiRequest(`/organizers?${params.toString()}`);
 

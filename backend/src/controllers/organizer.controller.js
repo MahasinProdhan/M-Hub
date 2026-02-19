@@ -3,6 +3,7 @@ import Organizer from "../models/organizer.model.js";
 export const getAllOrganizers = async (req, res, next) => {
   try {
     const { course, semester, branch, subject, search } = req.query;
+    const normalizedSearch = typeof search === "string" ? search.trim() : "";
 
     const filters = {};
 
@@ -22,10 +23,10 @@ export const getAllOrganizers = async (req, res, next) => {
       filters.subject = subject;
     }
 
-    if (search) {
+    if (normalizedSearch) {
       filters.$or = [
-        { title: { $regex: search, $options: "i" } },
-        { subject: { $regex: search, $options: "i" } },
+        { title: { $regex: normalizedSearch, $options: "i" } },
+        { subject: { $regex: normalizedSearch, $options: "i" } },
       ];
     }
 
