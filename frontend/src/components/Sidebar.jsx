@@ -1,8 +1,9 @@
 import { useMemo, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { RotateCcw } from "lucide-react";
+import { Bookmark, RotateCcw } from "lucide-react";
 import { COURSES, SEMESTERS, SUBJECTS } from "../utils/constants";
 import { useFilters } from "../context/FilterContext";
+import { useSavedResources } from "../context/SavedResourcesContext.jsx";
 
 const BRANCH_TO_SUBJECT_KEY = {
   "Computer Science Engineering": "cse",
@@ -11,9 +12,12 @@ const BRANCH_TO_SUBJECT_KEY = {
 
 const Sidebar = () => {
   const { setFilters } = useFilters();
+  const { savedItems } = useSavedResources();
   const location = useLocation();
 
   const isSyllabusPage = location.pathname === "/syllabus";
+  const isSavedMaterialsPage = location.pathname.startsWith("/saved");
+  const savedCount = savedItems.length;
 
   const [selectedCourseId, setSelectedCourseId] = useState("all");
   const [selectedSemester, setSelectedSemester] = useState("all");
@@ -211,8 +215,37 @@ const Sidebar = () => {
         </p>
         <ul className="space-y-2 text-sm text-slate-700">
           <li>
-            <Link to="/saved" className="transition-colors hover:text-blue-600">
-              Saved Materials
+            <Link
+              to="/saved"
+              className={`group flex items-center justify-between rounded-md px-2 py-1.5 transition-colors ${
+                isSavedMaterialsPage
+                  ? "bg-amber-50 text-amber-700"
+                  : "text-slate-700 hover:bg-slate-100 hover:text-blue-600"
+              } cursor-pointer`}
+            >
+              <span className="flex items-center gap-2">
+                <Bookmark
+                  size={15}
+                  className={`${
+                    isSavedMaterialsPage
+                      ? "text-amber-500"
+                      : "text-amber-400 group-hover:text-amber-500"
+                  } transition-colors`}
+                />
+                <span>Saved Materials</span>
+              </span>
+              {savedCount > 0 && (
+                <span
+                  className={`rounded-full px-2 py-0.5 text-xs font-medium ${
+                    isSavedMaterialsPage
+                      ? "bg-amber-100 text-amber-700"
+                      : "bg-slate-100 text-slate-600 group-hover:bg-blue-50 group-hover:text-blue-600"
+                  } transition-colors`}
+                  aria-label={`${savedCount} saved materials`}
+                >
+                  {savedCount}
+                </span>
+              )}
             </Link>
           </li>
           <li>
