@@ -4,6 +4,12 @@ import { apiRequest } from "../../services/api.js";
 import toast from "react-hot-toast";
 import { confirmToast } from "../../utils/confirmToast.jsx";
 import { COURSES, SEMESTERS } from "../../utils/constants.js";
+import { Pencil, Sparkles, Trash2 } from "lucide-react";
+
+const COURSE_NAME_MAP = COURSES.reduce((acc, course) => {
+  acc[course.id] = course.name;
+  return acc;
+}, {});
 
 const filterPyqList = (list, filters) => {
   let filtered = [...list];
@@ -200,62 +206,71 @@ const ManagePYQs = () => {
     <AdminLayout>
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-2xl font-semibold text-textPrimary">Manage PYQs</h1>
-        <p className="mt-1 text-sm text-textSecondary">
+        <h1 className="flex items-center gap-2 text-2xl font-semibold text-textPrimary">
+          <span className="flex items-center justify-center w-8 h-8 rounded-lg bg-blue-50 text-primary">
+            <Sparkles size={16} />
+          </span>
+          Manage PYQs
+        </h1>
+        <p className="mt-2 text-sm text-textSecondary">
           View, edit and delete previous year question papers
         </p>
       </div>
 
       {/* Filters */}
-      <div className="grid grid-cols-1 gap-4 p-4 mb-6 md:grid-cols-4 card shadow-card">
-        <select
-          value={filters.course}
-          onChange={(e) => setFilters({ ...filters, course: e.target.value })}
-          className="h-10 px-3 border rounded-md border-borderLight"
-        >
-          <option value="">All Courses</option>
-          {COURSES.map((course) => (
-            <option key={course.id} value={course.id}>
-              {course.name}
-            </option>
-          ))}
-        </select>
+      <div className="mb-6 overflow-hidden border rounded-2xl border-slate-200 bg-white shadow-[0_12px_30px_-20px_rgba(15,23,42,0.35)]">
+        <div className="grid grid-cols-1 gap-4 p-4 md:grid-cols-4">
+          <select
+            value={filters.course}
+            onChange={(e) => setFilters({ ...filters, course: e.target.value })}
+            className="h-10 px-3 border rounded-md border-borderLight"
+          >
+            <option value="">All Courses</option>
+            {COURSES.map((course) => (
+              <option key={course.id} value={course.id}>
+                {course.name}
+              </option>
+            ))}
+          </select>
 
-        <select
-          value={filters.semester}
-          onChange={(e) => setFilters({ ...filters, semester: e.target.value })}
-          className="h-10 px-3 border rounded-md border-borderLight"
-        >
-          <option value="">All Semesters</option>
-          {SEMESTERS.map((s) => (
-            <option key={s} value={s}>
-              {s}
-            </option>
-          ))}
-        </select>
+          <select
+            value={filters.semester}
+            onChange={(e) => setFilters({ ...filters, semester: e.target.value })}
+            className="h-10 px-3 border rounded-md border-borderLight"
+          >
+            <option value="">All Semesters</option>
+            {SEMESTERS.map((s) => (
+              <option key={s} value={s}>
+                {s}
+              </option>
+            ))}
+          </select>
 
-        <input
-          type="number"
-          placeholder="Year"
-          value={filters.year}
-          onChange={(e) => setFilters({ ...filters, year: e.target.value })}
-          className="h-10 px-3 border rounded-md border-borderLight"
-        />
+          <input
+            type="number"
+            placeholder="Year"
+            value={filters.year}
+            onChange={(e) => setFilters({ ...filters, year: e.target.value })}
+            className="h-10 px-3 border rounded-md border-borderLight"
+          />
 
-        <input
-          type="text"
-          placeholder="Search subject"
-          value={filters.subject}
-          onChange={(e) => setFilters({ ...filters, subject: e.target.value })}
-          className="h-10 px-3 border rounded-md border-borderLight"
-        />
+          <input
+            type="text"
+            placeholder="Search subject"
+            value={filters.subject}
+            onChange={(e) => setFilters({ ...filters, subject: e.target.value })}
+            className="h-10 px-3 border rounded-md border-borderLight"
+          />
+        </div>
 
-        <button
-          onClick={applyFilters}
-          className="h-10 text-white rounded-md bg-primary"
-        >
-          Apply Filters
-        </button>
+        <div className="px-4 pb-4">
+          <button
+            onClick={applyFilters}
+            className="h-10 px-6 text-sm font-medium text-white rounded-md bg-primary shadow-sm transition hover:opacity-95"
+          >
+            Apply Filters
+          </button>
+        </div>
       </div>
 
       {/* States */}
@@ -271,45 +286,81 @@ const ManagePYQs = () => {
 
       {/* Table */}
       {!loading && pyqs.length > 0 && (
-        <div className="p-4 overflow-x-auto card shadow-card">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="text-left border-b text-textSecondary">
-                <th className="py-2">Subject</th>
-                <th>Course</th>
-                <th>Semester</th>
-                <th>Year</th>
-                <th>Action</th>
-              </tr>
-            </thead>
+        <div className="overflow-hidden border rounded-2xl border-slate-200 bg-white shadow-[0_14px_36px_-24px_rgba(15,23,42,0.35)]">
+          <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100 bg-gradient-to-r from-slate-50 via-white to-blue-50">
+            <p className="text-sm font-semibold text-slate-700">PYQ Library</p>
+            <span className="inline-flex items-center rounded-full border border-blue-200 bg-blue-50 px-2.5 py-1 text-xs font-medium text-blue-700">
+              {pyqs.length} records
+            </span>
+          </div>
 
-            <tbody>
-              {pyqs.map((pyq) => (
-                <tr key={pyq._id} className="border-b last:border-none">
-                  <td className="py-2 font-medium text-textPrimary">
-                    {pyq.subject}
-                  </td>
-                  <td>{pyq.course}</td>
-                  <td>{pyq.semester}</td>
-                  <td>{pyq.year}</td>
-                  <td className="space-x-3">
-                    <button
-                      onClick={() => openEditModal(pyq)}
-                      className="text-sm font-medium text-primary hover:underline"
-                    >
-                      Edit
-                    </button>
-                    <button
-                      onClick={() => confirmDelete(pyq._id)}
-                      className="text-sm font-medium text-danger hover:underline"
-                    >
-                      Delete
-                    </button>
-                  </td>
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[760px] text-sm">
+              <thead className="bg-slate-50">
+                <tr className="text-xs font-semibold tracking-wide text-left uppercase border-b text-slate-500 border-borderLight">
+                  <th className="px-4 py-3">Subject</th>
+                  <th className="px-4 py-3">Course</th>
+                  <th className="px-4 py-3">Semester</th>
+                  <th className="px-4 py-3">Year</th>
+                  <th className="px-4 py-3">Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+
+              <tbody>
+                {pyqs.map((pyq, index) => (
+                  <tr
+                    key={pyq._id}
+                    className={`group border-b border-borderLight transition-colors hover:bg-slate-50 ${
+                      index % 2 === 0 ? "bg-white" : "bg-slate-50/40"
+                    }`}
+                  >
+                    <td className="px-4 py-3">
+                      <p className="font-semibold transition-colors text-textPrimary group-hover:text-slate-900">
+                        {pyq.subject}
+                      </p>
+                      {pyq.branch && (
+                        <p className="mt-1 text-xs text-slate-500">{pyq.branch}</p>
+                      )}
+                    </td>
+                    <td className="px-4 py-3">
+                      <span className="inline-flex items-center px-2.5 py-1 text-xs font-medium text-blue-700 border border-blue-100 rounded-full bg-blue-50">
+                        {COURSE_NAME_MAP[pyq.course] || pyq.course}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3">
+                      <span className="inline-flex items-center px-2.5 py-1 text-xs font-medium border rounded-full border-borderLight text-textSecondary bg-slate-100">
+                        Sem {pyq.semester}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3">
+                      <span className="inline-flex items-center px-2.5 py-1 text-xs font-medium border rounded-full border-borderLight text-textSecondary bg-slate-100">
+                        {pyq.year}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <button
+                          onClick={() => openEditModal(pyq)}
+                          className="inline-flex items-center gap-1.5 rounded-md border border-blue-200 bg-blue-50 px-2.5 py-1.5 text-xs font-medium text-blue-700 transition-all hover:-translate-y-[1px] hover:bg-blue-100"
+                        >
+                          <Pencil size={13} />
+                          <span>Edit</span>
+                        </button>
+
+                        <button
+                          onClick={() => confirmDelete(pyq._id)}
+                          className="inline-flex items-center gap-1.5 rounded-md border border-red-200 bg-red-50 px-2.5 py-1.5 text-xs font-medium text-red-600 transition-all hover:-translate-y-[1px] hover:bg-red-100"
+                        >
+                          <Trash2 size={13} />
+                          <span>Delete</span>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
 
