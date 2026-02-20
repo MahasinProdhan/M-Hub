@@ -4,6 +4,12 @@ import { apiRequest } from "../../services/api.js";
 import toast from "react-hot-toast";
 import { confirmToast } from "../../utils/confirmToast.jsx";
 import { COURSES, SEMESTERS } from "../../utils/constants.js";
+import { Pencil, Trash2 } from "lucide-react";
+
+const COURSE_NAME_MAP = COURSES.reduce((acc, course) => {
+  acc[course.id] = course.name;
+  return acc;
+}, {});
 
 const filterPyqList = (list, filters) => {
   let filtered = [...list];
@@ -271,40 +277,65 @@ const ManagePYQs = () => {
 
       {/* Table */}
       {!loading && pyqs.length > 0 && (
-        <div className="p-4 overflow-x-auto card shadow-card">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="text-left border-b text-textSecondary">
-                <th className="py-2">Subject</th>
-                <th>Course</th>
-                <th>Semester</th>
-                <th>Year</th>
-                <th>Action</th>
+        <div className="overflow-x-auto border rounded-xl border-borderLight card shadow-card">
+          <table className="w-full min-w-[760px] text-sm">
+            <thead className="bg-slate-50">
+              <tr className="text-xs font-semibold tracking-wide text-left uppercase border-b text-slate-500 border-borderLight">
+                <th className="px-4 py-3">Subject</th>
+                <th className="px-4 py-3">Course</th>
+                <th className="px-4 py-3">Semester</th>
+                <th className="px-4 py-3">Year</th>
+                <th className="px-4 py-3">Actions</th>
               </tr>
             </thead>
 
             <tbody>
-              {pyqs.map((pyq) => (
-                <tr key={pyq._id} className="border-b last:border-none">
-                  <td className="py-2 font-medium text-textPrimary">
-                    {pyq.subject}
+              {pyqs.map((pyq, index) => (
+                <tr
+                  key={pyq._id}
+                  className={`border-b border-borderLight transition-colors hover:bg-slate-50 ${
+                    index % 2 === 0 ? "bg-white" : "bg-slate-50/40"
+                  }`}
+                >
+                  <td className="px-4 py-3">
+                    <p className="font-semibold text-textPrimary">{pyq.subject}</p>
+                    {pyq.branch && (
+                      <p className="mt-1 text-xs text-slate-500">{pyq.branch}</p>
+                    )}
                   </td>
-                  <td>{pyq.course}</td>
-                  <td>{pyq.semester}</td>
-                  <td>{pyq.year}</td>
-                  <td className="space-x-3">
-                    <button
-                      onClick={() => openEditModal(pyq)}
-                      className="text-sm font-medium text-primary hover:underline"
-                    >
-                      Edit
-                    </button>
-                    <button
-                      onClick={() => confirmDelete(pyq._id)}
-                      className="text-sm font-medium text-danger hover:underline"
-                    >
-                      Delete
-                    </button>
+                  <td className="px-4 py-3">
+                    <span className="inline-flex items-center px-2.5 py-1 text-xs font-medium text-blue-700 border border-blue-100 rounded-full bg-blue-50">
+                      {COURSE_NAME_MAP[pyq.course] || pyq.course}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3">
+                    <span className="inline-flex items-center px-2.5 py-1 text-xs font-medium border rounded-full border-borderLight text-textSecondary bg-slate-100">
+                      Sem {pyq.semester}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3">
+                    <span className="inline-flex items-center px-2.5 py-1 text-xs font-medium border rounded-full border-borderLight text-textSecondary bg-slate-100">
+                      {pyq.year}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <button
+                        onClick={() => openEditModal(pyq)}
+                        className="inline-flex items-center gap-1.5 rounded-md border border-blue-200 bg-blue-50 px-2.5 py-1.5 text-xs font-medium text-blue-700 transition-colors hover:bg-blue-100"
+                      >
+                        <Pencil size={13} />
+                        <span>Edit</span>
+                      </button>
+
+                      <button
+                        onClick={() => confirmDelete(pyq._id)}
+                        className="inline-flex items-center gap-1.5 rounded-md border border-red-200 bg-red-50 px-2.5 py-1.5 text-xs font-medium text-red-600 transition-colors hover:bg-red-100"
+                      >
+                        <Trash2 size={13} />
+                        <span>Delete</span>
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}
