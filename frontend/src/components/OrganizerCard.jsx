@@ -1,5 +1,6 @@
 import { Layers } from "lucide-react";
 import SaveResourceButton from "./SaveResourceButton.jsx";
+import { resolveResourceUrl } from "../utils/resourceLink.js";
 
 const OrganizerCard = ({
   organizer,
@@ -8,7 +9,7 @@ const OrganizerCard = ({
   onToggleSave,
 }) => {
   const handleOpen = () => {
-    const url = organizer.fileUrl || organizer.driveLink;
+    const url = resolveResourceUrl(organizer.fileUrl, organizer.driveLink);
     if (!url) return;
     window.open(url, "_blank", "noopener,noreferrer");
   };

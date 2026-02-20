@@ -4,6 +4,7 @@ import Sidebar from "../components/Sidebar";
 import ListSkeleton from "../components/skeletons/ListSkeleton.jsx";
 import { useAuth } from "../context/AuthContext.jsx";
 import { useSavedResources } from "../context/SavedResourcesContext.jsx";
+import { resolveResourceUrl } from "../utils/resourceLink.js";
 
 const TYPE_LABEL_MAP = {
   pyq: "PYQ",
@@ -145,7 +146,10 @@ const SavedMaterials = () => {
                       <button
                         type="button"
                         onClick={() => {
-                          const url = resource.fileUrl || resource.driveLink;
+                          const url = resolveResourceUrl(
+                            resource.fileUrl,
+                            resource.driveLink,
+                          );
                           if (!url) return;
                           window.open(url, "_blank", "noopener,noreferrer");
                         }}

@@ -5,6 +5,7 @@ import ActionCard from "../components/ActionCard";
 import { apiRequest } from "../services/api.js";
 import DashboardSkeleton from "../components/skeletons/DashboardSkeleton.jsx";
 import { useAuth } from "../context/AuthContext.jsx";
+import { resolveResourceUrl } from "../utils/resourceLink.js";
 
 const TYPE_CONFIG = {
   pyq: {
@@ -33,7 +34,7 @@ const normalizeRecentItems = ({
     meta: `Semester ${item.semester} - ${item.course?.toUpperCase() || ""}${
       item.branch ? ` - ${item.branch}` : ""
     }`,
-    href: item.fileUrl || item.driveLink,
+    href: resolveResourceUrl(item.fileUrl, item.driveLink),
     createdAt: item.createdAt || "",
   }));
 
@@ -44,7 +45,7 @@ const normalizeRecentItems = ({
     meta: `Semester ${item.semester} - ${item.course?.toUpperCase() || ""}${
       item.branch ? ` - ${item.branch}` : ""
     }`,
-    href: item.fileUrl || item.driveLink,
+    href: resolveResourceUrl(item.fileUrl, item.driveLink),
     createdAt: item.createdAt || "",
   }));
 
@@ -55,7 +56,7 @@ const normalizeRecentItems = ({
     meta: `Semester ${item.semester} - ${item.course?.toUpperCase() || ""}${
       item.branch ? ` - ${item.branch}` : ""
     }`,
-    href: item.fileUrl || item.driveLink,
+    href: resolveResourceUrl(item.fileUrl, item.driveLink),
     createdAt: item.createdAt || "",
   }));
 

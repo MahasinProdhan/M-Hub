@@ -1,9 +1,10 @@
 import { FileText } from "lucide-react";
 import SaveResourceButton from "./SaveResourceButton.jsx";
+import { resolveResourceUrl } from "../utils/resourceLink.js";
 
 const PYQCard = ({ pyq, isSaved = false, isSaving = false, onToggleSave }) => {
   const handleOpen = () => {
-    const url = pyq.fileUrl || pyq.driveLink;
+    const url = resolveResourceUrl(pyq.fileUrl, pyq.driveLink);
     if (!url) return;
     window.open(url, "_blank", "noopener,noreferrer");
   };

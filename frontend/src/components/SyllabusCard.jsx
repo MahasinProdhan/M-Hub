@@ -1,8 +1,9 @@
 import { BookMarked } from "lucide-react";
+import { resolveResourceUrl } from "../utils/resourceLink.js";
 
 const SyllabusCard = ({ syllabus }) => {
   const handleOpen = () => {
-    const url = syllabus.fileUrl || syllabus.driveLink;
+    const url = resolveResourceUrl(syllabus.fileUrl, syllabus.driveLink);
     if (!url) return;
     window.open(url, "_blank", "noopener,noreferrer");
   };

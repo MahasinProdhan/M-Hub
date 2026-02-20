@@ -1,4 +1,5 @@
 import Organizer from "../models/organizer.model.js";
+import { withPdfViewUrl } from "../utils/pdfView.utils.js";
 
 export const getAllOrganizers = async (req, res, next) => {
   try {
@@ -31,11 +32,14 @@ export const getAllOrganizers = async (req, res, next) => {
     }
 
     const organizers = await Organizer.find(filters).sort({ year: -1 });
+    const responseData = organizers.map((organizer) =>
+      withPdfViewUrl(organizer, req),
+    );
 
     res.status(200).json({
       success: true,
-      count: organizers.length,
-      data: organizers,
+      count: responseData.length,
+      data: responseData,
     });
   } catch (error) {
     next(error);
