@@ -31,7 +31,7 @@ const syllabusSchema = new mongoose.Schema(
   { timestamps: true },
 );
 
-syllabusSchema.pre("validate", function ensureResourceLink(next) {
+syllabusSchema.pre("validate", function ensureResourceLink() {
   const hasFileUrl =
     typeof this.fileUrl === "string" && this.fileUrl.trim().length > 0;
   const hasDriveLink =
@@ -41,8 +41,6 @@ syllabusSchema.pre("validate", function ensureResourceLink(next) {
     this.invalidate("fileUrl", "Either fileUrl or driveLink is required");
     this.invalidate("driveLink", "Either fileUrl or driveLink is required");
   }
-
-  next();
 });
 
 const Syllabus = mongoose.model("Syllabus", syllabusSchema);

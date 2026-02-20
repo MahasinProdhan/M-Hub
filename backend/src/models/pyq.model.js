@@ -46,7 +46,7 @@ const pyqSchema = new mongoose.Schema(
   },
 );
 
-pyqSchema.pre("validate", function ensureResourceLink(next) {
+pyqSchema.pre("validate", function ensureResourceLink() {
   const hasFileUrl =
     typeof this.fileUrl === "string" && this.fileUrl.trim().length > 0;
   const hasDriveLink =
@@ -56,8 +56,6 @@ pyqSchema.pre("validate", function ensureResourceLink(next) {
     this.invalidate("fileUrl", "Either fileUrl or driveLink is required");
     this.invalidate("driveLink", "Either fileUrl or driveLink is required");
   }
-
-  next();
 });
 
 const PYQ = mongoose.model("PYQ", pyqSchema);

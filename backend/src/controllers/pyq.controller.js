@@ -1,4 +1,5 @@
 import PYQ from "../models/pyq.model.js";
+import { withPdfViewUrl } from "../utils/pdfView.utils.js";
 
 export const getAllPYQs = async (req, res, next) => {
   try {
@@ -38,11 +39,12 @@ export const getAllPYQs = async (req, res, next) => {
     }
 
     const pyqs = await PYQ.find(filters).sort({ year: -1 });
+    const responseData = pyqs.map((pyq) => withPdfViewUrl(pyq, req));
 
     res.status(200).json({
       success: true,
-      count: pyqs.length,
-      data: pyqs,
+      count: responseData.length,
+      data: responseData,
     });
   } catch (error) {
     next(error);

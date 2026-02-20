@@ -1,5 +1,6 @@
 import { BookOpen } from "lucide-react";
 import SaveResourceButton from "./SaveResourceButton.jsx";
+import { resolveResourceUrl } from "../utils/resourceLink.js";
 
 const StudyMaterialCard = ({
   material,
@@ -8,7 +9,7 @@ const StudyMaterialCard = ({
   onToggleSave,
 }) => {
   const handleOpen = () => {
-    const url = material.fileUrl || material.driveLink;
+    const url = resolveResourceUrl(material.fileUrl, material.driveLink);
     if (!url) return;
     window.open(url, "_blank", "noopener,noreferrer");
   };

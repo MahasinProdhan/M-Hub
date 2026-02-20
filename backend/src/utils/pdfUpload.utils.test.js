@@ -24,7 +24,10 @@ test("PDF upload success", async (t) => {
   });
 
   cloudinary.uploader.upload_stream = (options, callback) => {
-    assert.equal(options.resource_type, "raw");
+    assert.equal(options.resource_type, "image");
+    assert.equal(options.type, "upload");
+    assert.equal(options.access_mode, "public");
+    assert.equal(options.format, "pdf");
     assert.equal(options.folder, "mhub/pdfs");
 
     return {
@@ -114,4 +117,3 @@ test("Cloudinary fail + Drive fallback success", async (t) => {
   assert.equal(result.driveLink, driveLink);
   assert.equal(result.fallbackUsed, true);
 });
-

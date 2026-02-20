@@ -1,4 +1,5 @@
 import StudyMaterial from "../models/material.model.js";
+import { withPdfViewUrl } from "../utils/pdfView.utils.js";
 
 export const getAllMaterials = async (req, res, next) => {
   try {
@@ -23,11 +24,12 @@ export const getAllMaterials = async (req, res, next) => {
     const materials = await StudyMaterial.find(filters).sort({
       createdAt: -1,
     });
+    const responseData = materials.map((material) => withPdfViewUrl(material, req));
 
     res.status(200).json({
       success: true,
-      count: materials.length,
-      data: materials,
+      count: responseData.length,
+      data: responseData,
     });
   } catch (error) {
     next(error);

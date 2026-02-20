@@ -1,4 +1,5 @@
 import Syllabus from "../models/syllabus.model.js";
+import { withPdfViewUrl } from "../utils/pdfView.utils.js";
 
 export const getAllSyllabus = async (req, res, next) => {
   try {
@@ -19,11 +20,12 @@ export const getAllSyllabus = async (req, res, next) => {
     }
 
     const syllabus = await Syllabus.find(filters).sort({ semester: 1 });
+    const responseData = syllabus.map((item) => withPdfViewUrl(item, req));
 
     res.status(200).json({
       success: true,
-      count: syllabus.length,
-      data: syllabus,
+      count: responseData.length,
+      data: responseData,
     });
   } catch (error) {
     next(error);

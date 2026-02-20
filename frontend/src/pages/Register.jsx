@@ -8,7 +8,18 @@ const COURSES = [
   { id: "ba", name: "BA" },
 ];
 
-const BTECH_BRANCHES = ["CSE", "IT", "ECE", "EE", "ME", "CE"];
+const BTECH_BRANCHES = [
+  "CSE",
+  "IT",
+  "ECE",
+  "EE",
+  "ME",
+  "CE",
+  "CSBS",
+  "DATA SCIENCE",
+  "ECE AIML",
+  "CYBER SECURITY",
+];
 
 const Register = () => {
   const navigate = useNavigate();

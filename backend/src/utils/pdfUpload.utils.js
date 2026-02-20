@@ -3,6 +3,8 @@ import cloudinary from "../config/cloudinary.js";
 
 const CLOUDINARY_HOST = "res.cloudinary.com";
 const PDF_FOLDER = "mhub/pdfs";
+const CLOUDINARY_IMAGE_UPLOAD_SEGMENT = "/image/upload/";
+const CLOUDINARY_RAW_UPLOAD_SEGMENT = "/raw/upload/";
 
 const sanitizeBaseName = (filename = "document") => {
   const baseName = path.parse(filename).name || "document";
@@ -26,8 +28,12 @@ export const uploadPdfBufferToCloudinary = async (file) => {
   return new Promise((resolve, reject) => {
     const uploadStream = cloudinary.uploader.upload_stream(
       {
-        folder: "mhub/pdfs",
-        resource_type: "raw",
+        folder: PDF_FOLDER,
+        // Upload PDFs as image resources so Cloudinary serves them inline.
+        resource_type: "image",
+        type: "upload",
+        access_mode: "public",
+        format: "pdf",
         public_id: publicId,
       },
       (error, result) => {
@@ -110,6 +116,10 @@ export const extractPdfPublicIdFromUrl = (fileUrl) => {
     if (!parsed.hostname.includes(CLOUDINARY_HOST)) return null;
 
     const cleanPath = parsed.pathname || "";
+    const isImageResource = cleanPath.includes(CLOUDINARY_IMAGE_UPLOAD_SEGMENT);
+    const isRawResource = cleanPath.includes(CLOUDINARY_RAW_UPLOAD_SEGMENT);
+    if (!isImageResource && !isRawResource) return null;
+
     const uploadMarker = "/upload/";
     const uploadIndex = cleanPath.indexOf(uploadMarker);
     if (uploadIndex === -1) return null;
@@ -119,9 +129,13 @@ export const extractPdfPublicIdFromUrl = (fileUrl) => {
     if (folderIndex === -1) return null;
 
     const publicPathWithExtension = afterUpload.slice(folderIndex);
-    const publicPath = publicPathWithExtension.replace(/\.[a-zA-Z0-9]+$/, "");
+    const decodedPublicPath = decodeURIComponent(publicPathWithExtension);
 
-    return decodeURIComponent(publicPath);
+    if (isImageResource) {
+      return decodedPublicPath.replace(/\.[a-zA-Z0-9]+$/, "");
+    }
+
+    return decodedPublicPath;
   } catch (error) {
     return null;
   }
@@ -139,10 +153,33 @@ export const deletePdfFromCloudinary = async (resource = {}) => {
   const publicId = getPdfPublicId(resource);
   if (!publicId) return false;
 
-  await cloudinary.uploader.destroy(publicId, {
-    resource_type: "raw",
+  const fileUrl = typeof resource?.fileUrl === "string" ? resource.fileUrl : "";
+  const primaryResourceType = fileUrl.includes(CLOUDINARY_IMAGE_UPLOAD_SEGMENT)
+    ? "image"
+    : "raw";
+  const fallbackResourceType = primaryResourceType === "image" ? "raw" : "image";
+
+  const firstAttempt = await cloudinary.uploader.destroy(publicId, {
+    resource_type: primaryResourceType,
     invalidate: true,
   });
 
-  return true;
+  if (firstAttempt?.result === "ok") {
+    return true;
+  }
+
+  if (firstAttempt?.result !== "not found") {
+    return false;
+  }
+
+  const secondAttempt = await cloudinary.uploader.destroy(publicId, {
+    resource_type: fallbackResourceType,
+    invalidate: true,
+  });
+
+  if (secondAttempt?.result === "ok") {
+    return true;
+  }
+
+  return false;
 };

@@ -8,6 +8,7 @@ import {
   extractCloudinaryPublicId,
   toAvatarClientPath,
 } from "../utils/avatar.utils.js";
+import { withPdfViewUrl } from "../utils/pdfView.utils.js";
 
 const RESOURCE_MODEL_MAP = {
   pyq: PYQ,
@@ -41,7 +42,7 @@ const formatUserAvatarForClient = (userDoc) => {
   return user;
 };
 
-const hydrateSavedResources = async (savedResources) => {
+const hydrateSavedResources = async (savedResources, req) => {
   if (!Array.isArray(savedResources) || savedResources.length === 0) {
     return [];
   }
@@ -101,7 +102,7 @@ const hydrateSavedResources = async (savedResources) => {
     hydratedItems.push({
       resourceType: item.resourceType,
       resourceId: String(item.resourceId),
-      resource,
+      resource: withPdfViewUrl(resource, req),
     });
   }
 
@@ -238,6 +239,7 @@ export const saveResource = async (req, res, next) => {
     if (!resource) {
       return res.status(404).json({ message: "Resource not found" });
     }
+    const clientResource = withPdfViewUrl(resource, req);
 
     const user = await User.findById(userId).select("savedResources");
     if (!user) {
@@ -267,7 +269,7 @@ export const saveResource = async (req, res, next) => {
       data: {
         resourceType,
         resourceId: String(resourceId),
-        resource,
+        resource: clientResource,
       },
     });
   } catch (error) {
@@ -343,6 +345,7 @@ export const getSavedResources = async (req, res, next) => {
 
     const hydratedSavedResources = await hydrateSavedResources(
       user.savedResources || [],
+      req,
     );
 
     res.status(200).json({

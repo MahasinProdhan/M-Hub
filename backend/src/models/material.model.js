@@ -49,7 +49,7 @@ const materialSchema = new mongoose.Schema(
   { timestamps: true },
 );
 
-materialSchema.pre("validate", function ensureResourceLink(next) {
+materialSchema.pre("validate", function ensureResourceLink() {
   const hasFileUrl =
     typeof this.fileUrl === "string" && this.fileUrl.trim().length > 0;
   const hasDriveLink =
@@ -59,8 +59,6 @@ materialSchema.pre("validate", function ensureResourceLink(next) {
     this.invalidate("fileUrl", "Either fileUrl or driveLink is required");
     this.invalidate("driveLink", "Either fileUrl or driveLink is required");
   }
-
-  next();
 });
 
 const StudyMaterial = mongoose.model("StudyMaterial", materialSchema);

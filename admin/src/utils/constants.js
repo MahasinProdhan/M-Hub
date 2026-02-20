@@ -15,6 +15,10 @@ export const COURSES = [
       "Electrical Engineering",
       "Mechanical Engineering",
       "Civil Engineering",
+      "Computer Science & Business Systems (CSBS)",
+      "Data Science",
+      "ECE (AI & ML)",
+      "Computer Science (Cyber Security)",
     ],
   },
   {
