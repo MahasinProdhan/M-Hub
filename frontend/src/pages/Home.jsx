@@ -7,6 +7,13 @@ import DashboardSkeleton from "../components/skeletons/DashboardSkeleton.jsx";
 import { useAuth } from "../context/AuthContext.jsx";
 import { resolveResourceUrl } from "../utils/resourceLink.js";
 
+const COURSE_LABELS = {
+  btech: "BTech",
+  bca: "BCA",
+  bsc: "BSc",
+  ba: "BA",
+};
+
 const TYPE_CONFIG = {
   pyq: {
     label: "PYQ",
@@ -22,6 +29,46 @@ const TYPE_CONFIG = {
   },
 };
 
+const getCourseLabel = (course) => {
+  if (!course) return "";
+
+  const normalizedCourse = String(course).trim();
+  if (!normalizedCourse) return "";
+
+  return COURSE_LABELS[normalizedCourse.toLowerCase()] || normalizedCourse;
+};
+
+const getRecentItemMeta = (item) => {
+  const details = [];
+
+  if (item.semester) {
+    details.push(`Semester ${item.semester}`);
+  }
+
+  if (item.course) {
+    details.push(String(item.course).toUpperCase());
+  }
+
+  if (item.branch) {
+    details.push(item.branch);
+  }
+
+  return details.join(" - ");
+};
+
+const formatRecentDate = (createdAt) => {
+  if (!createdAt) return "";
+
+  const parsedDate = new Date(createdAt);
+  if (Number.isNaN(parsedDate.getTime())) return "";
+
+  return parsedDate.toLocaleDateString(undefined, {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  });
+};
+
 const normalizeRecentItems = ({
   pyqs = [],
   materials = [],
@@ -31,9 +78,7 @@ const normalizeRecentItems = ({
     id: `pyq:${item._id}`,
     type: "pyq",
     title: `${item.subject} (${item.year})`,
-    meta: `Semester ${item.semester} - ${item.course?.toUpperCase() || ""}${
-      item.branch ? ` - ${item.branch}` : ""
-    }`,
+    meta: getRecentItemMeta(item),
     href: resolveResourceUrl(item.fileUrl, item.driveLink),
     createdAt: item.createdAt || "",
   }));
@@ -42,9 +87,7 @@ const normalizeRecentItems = ({
     id: `material:${item._id}`,
     type: "material",
     title: item.title,
-    meta: `Semester ${item.semester} - ${item.course?.toUpperCase() || ""}${
-      item.branch ? ` - ${item.branch}` : ""
-    }`,
+    meta: getRecentItemMeta(item),
     href: resolveResourceUrl(item.fileUrl, item.driveLink),
     createdAt: item.createdAt || "",
   }));
@@ -53,9 +96,7 @@ const normalizeRecentItems = ({
     id: `organizer:${item._id}`,
     type: "organizer",
     title: item.title,
-    meta: `Semester ${item.semester} - ${item.course?.toUpperCase() || ""}${
-      item.branch ? ` - ${item.branch}` : ""
-    }`,
+    meta: getRecentItemMeta(item),
     href: resolveResourceUrl(item.fileUrl, item.driveLink),
     createdAt: item.createdAt || "",
   }));
@@ -70,12 +111,18 @@ const normalizeRecentItems = ({
 };
 
 const Home = () => {
-  // TEMPORARY: frontend-only
-  const { user, isLoggedIn, loading: authLoading } = useAuth();
+  const { user, isLoggedIn } = useAuth();
 
   const [recentItems, setRecentItems] = useState([]);
   const [recentLoading, setRecentLoading] = useState(true);
   const [recentError, setRecentError] = useState("");
+  const displayName = user?.name?.trim() || "Student";
+  const courseLabel = getCourseLabel(user?.course);
+  const semesterLabel = String(user?.semester ?? "").trim();
+  const hasPersonalizedWelcome = Boolean(courseLabel && semesterLabel);
+  const welcomeSubtitle = hasPersonalizedWelcome
+    ? `Resources curated for your ${courseLabel} Semester ${semesterLabel}`
+    : "Quickly access academic resources like PYQs, study materials, organizers, and syllabus for your semester.";
 
   useEffect(() => {
     let cancelled = false;
@@ -103,7 +150,9 @@ const Home = () => {
         setRecentItems(items);
       } catch (error) {
         if (cancelled) return;
-        setRecentError("Unable to load recently added resources.");
+        setRecentError(
+          "We could not load recently added resources right now. Please try again shortly.",
+        );
       } finally {
         if (!cancelled) {
           setRecentLoading(false);
@@ -159,12 +208,11 @@ const Home = () => {
             <main className="flex-1 p-8 transition-opacity duration-300 opacity-100">
               <div className="p-6 border border-blue-100 shadow-sm rounded-2xl bg-gradient-to-r from-blue-50 to-indigo-50">
                 <h2 className="text-2xl font-semibold text-slate-900">
-                  Welcome back, {user?.name || "Student"} 👋
+                  Welcome back, {displayName}
                 </h2>
 
                 <p className="max-w-xl mt-2 text-sm text-slate-600">
-                  Quickly access academic resources like PYQs, study materials,
-                  organizers, and syllabus for your semester.
+                  {welcomeSubtitle}
                 </p>
               </div>
 
@@ -205,47 +253,61 @@ const Home = () => {
                 </div>
 
                 {recentError && (
-                  <div className="p-4 text-sm text-red-600 border border-red-200 rounded-lg bg-red-50">
+                  <div className="p-4 text-sm border border-red-200 rounded-xl text-red-700 bg-red-50">
                     {recentError}
                   </div>
                 )}
 
                 {!recentError && recentItems.length === 0 && (
                   <div className="p-4 text-sm bg-white border rounded-xl border-slate-200 text-slate-600">
-                    No recent resources available right now.
+                    Nothing new has been added yet. Check back soon for fresh
+                    resources.
                   </div>
                 )}
 
                 {!recentError && recentItems.length > 0 && (
                   <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                    {recentItems.map((item) => (
-                      <a
-                        key={item.id}
-                        href={item.href}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-start justify-between gap-3 p-4 transition-all bg-white border group rounded-xl border-slate-200 hover:border-blue-200 hover:shadow-md"
-                      >
-                        <div className="min-w-0">
-                          <span
-                            className={`inline-flex rounded-full px-2 py-1 text-xs font-medium ${
-                              TYPE_CONFIG[item.type].badgeClass
-                            }`}
-                          >
-                            {TYPE_CONFIG[item.type].label}
-                          </span>
+                    {recentItems.map((item) => {
+                      const formattedDate = formatRecentDate(item.createdAt);
 
-                          <p className="mt-2 text-sm font-medium truncate text-slate-900">
-                            {item.title}
-                          </p>
-                          <p className="mt-1 text-sm truncate text-slate-600">
-                            {item.meta}
-                          </p>
-                        </div>
+                      return (
+                        <a
+                          key={item.id}
+                          href={item.href}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex flex-col h-full gap-3 p-4 transition-all bg-white border rounded-xl border-slate-200 cursor-pointer hover:border-blue-200 hover:shadow-md"
+                        >
+                          <div className="flex items-start justify-between gap-3">
+                            <span
+                              className={`inline-flex rounded-full px-2 py-1 text-xs font-medium ${
+                                TYPE_CONFIG[item.type].badgeClass
+                              }`}
+                            >
+                              {TYPE_CONFIG[item.type].label}
+                            </span>
+                            <ArrowUpRight className="w-4 h-4 mt-1 text-slate-400" />
+                          </div>
 
-                        <ArrowUpRight className="w-4 h-4 mt-1 transition-all -translate-x-1 opacity-0 text-slate-500 group-hover:translate-x-0 group-hover:opacity-100 group-hover:text-blue-600" />
-                      </a>
-                    ))}
+                          <div className="min-w-0">
+                            <p className="text-sm font-semibold truncate text-slate-900">
+                              {item.title}
+                            </p>
+                            {item.meta && (
+                              <p className="mt-1 text-sm truncate text-slate-500">
+                                {item.meta}
+                              </p>
+                            )}
+                          </div>
+
+                          {formattedDate && (
+                            <p className="mt-auto text-xs text-right text-slate-400">
+                              {formattedDate}
+                            </p>
+                          )}
+                        </a>
+                      );
+                    })}
                   </div>
                 )}
               </section>
