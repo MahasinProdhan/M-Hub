@@ -22,8 +22,35 @@ import ScrollToTop from "./components/ScrollToTop";
 
 // Context
 import { FilterProvider } from "./context/FilterContext";
+import { useAuth } from "./context/AuthContext.jsx";
+
+const RequireAuth = ({ isLoggedIn, children }) => {
+  if (!isLoggedIn) {
+    return <Navigate to="/login" replace />;
+  }
+
+  return children;
+};
+
+const GuestOnly = ({ isLoggedIn, children }) => {
+  if (isLoggedIn) {
+    return <Navigate to="/" replace />;
+  }
+
+  return children;
+};
 
 function App() {
+  const { isLoggedIn, loading } = useAuth();
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-slate-50">
+        <p className="text-sm text-slate-600">Loading...</p>
+      </div>
+    );
+  }
+
   return (
     <FilterProvider>
       {/* Global UI */}
@@ -33,30 +60,111 @@ function App() {
 
       {/* Routes */}
       <Routes>
-        {/* Public / Landing */}
-        <Route path="/" element={<Home />} />
+        {/* Public Auth */}
+        <Route
+          path="/login"
+          element={
+            <GuestOnly isLoggedIn={isLoggedIn}>
+              <Login />
+            </GuestOnly>
+          }
+        />
+        <Route
+          path="/register"
+          element={
+            <GuestOnly isLoggedIn={isLoggedIn}>
+              <Register />
+            </GuestOnly>
+          }
+        />
 
-        {/* Auth (UI only for now) */}
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-
-        {/* Academic Resources */}
-        <Route path="/pyqs" element={<PYQs />} />
-        <Route path="/materials" element={<StudyMaterials />} />
-        <Route path="/organizers" element={<Organizers />} />
-        <Route path="/syllabus" element={<Syllabus />} />
-
-        {/* User */}
-        <Route path="/profile" element={<Profile />} />
-        <Route path="/saved" element={<SavedMaterials />} />
-
-        {/* Informational Pages */}
-        <Route path="/about" element={<About />} />
-        <Route path="/faq" element={<FAQ />} />
-        <Route path="/help" element={<Help />} />
+        {/* Protected */}
+        <Route
+          path="/"
+          element={
+            <RequireAuth isLoggedIn={isLoggedIn}>
+              <Home />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/pyqs"
+          element={
+            <RequireAuth isLoggedIn={isLoggedIn}>
+              <PYQs />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/materials"
+          element={
+            <RequireAuth isLoggedIn={isLoggedIn}>
+              <StudyMaterials />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/organizers"
+          element={
+            <RequireAuth isLoggedIn={isLoggedIn}>
+              <Organizers />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/syllabus"
+          element={
+            <RequireAuth isLoggedIn={isLoggedIn}>
+              <Syllabus />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/profile"
+          element={
+            <RequireAuth isLoggedIn={isLoggedIn}>
+              <Profile />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/saved"
+          element={
+            <RequireAuth isLoggedIn={isLoggedIn}>
+              <SavedMaterials />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/about"
+          element={
+            <RequireAuth isLoggedIn={isLoggedIn}>
+              <About />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/faq"
+          element={
+            <RequireAuth isLoggedIn={isLoggedIn}>
+              <FAQ />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/help"
+          element={
+            <RequireAuth isLoggedIn={isLoggedIn}>
+              <Help />
+            </RequireAuth>
+          }
+        />
 
         {/* Fallback */}
-        <Route path="*" element={<Navigate to="/" replace />} />
+        <Route
+          path="*"
+          element={<Navigate to={isLoggedIn ? "/" : "/login"} replace />}
+        />
       </Routes>
 
       <Footer />
